@@ -9,10 +9,18 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>Organizer (macOS).xcscheme_^#shared#^_</key>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>49A4044D24F1155D0076F7C4</key>
 		<dict>
-			<key>orderHint</key>
-			<integer>1</integer>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>49A4047424F11C9A0076F7C4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

@@ -1,0 +1,82 @@
+//
+//  MarkdownParser.swift
+//  Organizer
+//
+//  Created by Miguel Themann on 22.08.20.
+// Inspired by Checklist (my own project, though)
+
+import Foundation
+import EventKit
+
+/// Parser for Markdown as provided by Thing's Share Sheet
+struct MarkdownParser {
+    
+    static let _emojiRegex = NSRegularExpression("[\\U00010000-\\U0010FFFF]")
+    static let _singleWordChar = #"[\w\s\d@ß?=!\^°\"\'§\$,&\.%\/\(\)]"#
+    static let taskRegex = NSRegularExpression(#"- \[[+ x]?\] ?(?<date>\d\d\.\d\d\.\d\d\d\d)? (?<title>"# + _singleWordChar + #"+)"#)
+    static let taskNameRegex = NSRegularExpression(#"^ ?((?<n1>\d\d?)(?<u>h|(min|m))(( )?(?<n2>\d\d?)(min|m))?)? ?(?<title>"# + _singleWordChar + #"*)$"#)
+    
+    func parseTasks(from text: String) -> [Task] {
+        let text = MarkdownParser._emojiRegex.stringByReplacingMatches(in: text, range: NSRange(location: 0, length: text.count), withTemplate: "")
+        
+        var tasks = [Task]()
+        for line in text.split(separator: "\n").map({String($0)}) {
+            if line.starts(with: "- [") {
+                guard let result = MarkdownParser.taskRegex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) else { continue }
+                var nsRange = result.range(withName: "title")
+                guard let range = Range(nsRange) else { continue }
+                let title = String(line[range])
+                nsRange = result.range(withName: "date")
+                guard let dateRange = Range(nsRange) else { continue }
+                guard let taskDate = _parseDate(from: String(line[dateRange])) else { continue }
+                let timeAndTitle = _getTimeInterval(from: title)
+                guard let newTime = timeAndTitle.time else { continue }
+                guard let newTitle = timeAndTitle.title else { continue }
+                let task = Task(title: newTitle, date: taskDate, time: newTime)
+                tasks.append(task)
+            }
+        }
+        return tasks
+    }
+    
+    func _parseDate(from: String) -> Date? {
+        let l = from.split(separator: ".")
+        guard l.count == 3 else { return nil }
+        var dateComponents = DateComponents()
+        dateComponents.day = Int(l[0])
+        dateComponents.month = Int(l[1])
+        dateComponents.year = Int(l[2])
+        
+        return Calendar.current.date(from: dateComponents)
+    }
+    
+    func _getTimeInterval(from taskName: String) -> (time: TimeInterval?, title: String?) {
+        guard let result = MarkdownParser.taskNameRegex.firstMatch(in: taskName, range: NSRange(location: 0, length: taskName.count)) else { return (nil, nil) }
+        guard let n1Range = Range(result.range(withName: "n1")) else { return (nil, nil) }
+        guard let uRange = Range(result.range(withName: "u")) else { return (nil, nil) }
+        guard let titleRange = Range(result.range(withName: "title")) else { return (nil, nil) }
+        
+        guard let n1 = Double(String(taskName[n1Range])) else { return (nil, nil) }
+        let u = String(taskName[uRange])
+        
+        var timeInterval: TimeInterval
+        
+        if u == "h" {
+            timeInterval = 3600 * n1
+        } else if u == "min" || u == "m" {
+            timeInterval = 60 * n1
+        } else {
+            NSLog("Received unsupported unit: \(u)")
+            return (nil, nil)
+        }
+        
+        if let n2Range = Range(result.range(withName: "n2")) {
+            guard let n2 = Double(String(taskName[n2Range])) else { return (nil, nil) }
+            timeInterval += n2 * 60
+        }
+        
+        let title = String(taskName[titleRange])
+        
+        return (timeInterval, title)
+    }
+}
