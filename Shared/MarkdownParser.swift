@@ -13,7 +13,7 @@ struct MarkdownParser {
     
     static let _emojiRegex = NSRegularExpression("[\\U00010000-\\U0010FFFF]")
     static let _singleWordChar = #"[\w\s\d@ß?=!\^°\"\'§\$,&\.%\/\(\)]"#
-    static let taskRegex = NSRegularExpression(#"- \[[+ x]?\] ?(?<date>\d\d\.\d\d\.\d\d\d\d)? (?<title>"# + _singleWordChar + #"+)"#)
+    static let taskRegex = NSRegularExpression(#"- (?<date>\d\d\.\d\d\.\d\d\d\d )?\[[+ x]?\] (?<title>"# + _singleWordChar + #"+)"#)
     static let taskNameRegex = NSRegularExpression(#"^ ?((?<n1>\d\d?)(?<u>h|(min|m))(( )?(?<n2>\d\d?)(min|m))?)? ?(?<title>"# + _singleWordChar + #"*)$"#)
     
     func parseTasks(from text: String) -> [Task] {
@@ -21,33 +21,37 @@ struct MarkdownParser {
         
         var tasks = [Task]()
         for line in text.split(separator: "\n").map({String($0)}) {
-            if line.starts(with: "- [") {
-                guard let result = MarkdownParser.taskRegex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) else { continue }
-                var nsRange = result.range(withName: "title")
-                guard let range = Range(nsRange) else { continue }
-                let title = String(line[range])
-                nsRange = result.range(withName: "date")
-                guard let dateRange = Range(nsRange) else { continue }
-                guard let taskDate = _parseDate(from: String(line[dateRange])) else { continue }
-                let timeAndTitle = _getTimeInterval(from: title)
-                guard let newTime = timeAndTitle.time else { continue }
-                guard let newTitle = timeAndTitle.title else { continue }
-                let task = Task(title: newTitle, date: taskDate, time: newTime)
-                tasks.append(task)
-            }
+            guard let result = MarkdownParser.taskRegex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) else { continue }
+            var nsRange = result.range(withName: "title")
+            guard let range = Range(nsRange) else { continue }
+            let title = String(line[range])
+            nsRange = result.range(withName: "date")
+            guard let dateRange = Range(nsRange) else { continue }
+            guard let taskDate = _parseDate(from: String(line[dateRange])) else { continue }
+            let timeAndTitle = _getTimeInterval(from: title)
+            guard let newTime = timeAndTitle.time else { continue }
+            guard let newTitle = timeAndTitle.title else { continue }
+            let task = Task(title: newTitle, date: taskDate, time: newTime)
+            tasks.append(task)
         }
         return tasks
     }
     
     func _parseDate(from: String) -> Date? {
-        let l = from.split(separator: ".")
+        let l = from.replacingOccurrences(of: " ", with: "").split(separator: ".")
         guard l.count == 3 else { return nil }
         var dateComponents = DateComponents()
+        
+        dateComponents.nanosecond = 0
+        dateComponents.minute = 0
+        dateComponents.hour = 12
+        
         dateComponents.day = Int(l[0])
         dateComponents.month = Int(l[1])
         dateComponents.year = Int(l[2])
         
-        return Calendar.current.date(from: dateComponents)
+        let date = Calendar.current.date(from: dateComponents)
+        return date
     }
     
     func _getTimeInterval(from taskName: String) -> (time: TimeInterval?, title: String?) {

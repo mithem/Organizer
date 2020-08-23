@@ -32,6 +32,13 @@ class MarkdownParserTests: XCTestCase {
         if let result = result {
             XCTAssertEqual(string[Range(result.range(at: 2))!], "Another task")
         }
+        
+        string = "- 23.08.2020 [] Another task🚀"
+        result = MarkdownParser.taskRegex.firstMatch(in: string, range: range)
+        XCTAssertNotNil(result, "No match found.")
+        if let result = result {
+            XCTAssertEqual(string[Range(result.range(at: 2))!], "Another task")
+        }
     }
     
     func testTaskNameRegex() {
@@ -124,8 +131,8 @@ class MarkdownParserTests: XCTestCase {
     }
     
     func testParseDateFromString() {
-        let input = ["01.01.2001", "01.01.1970", "31.12.2020", "22.08.2020"]
-        let expectedComponents = [DateComponents(year: 2001, month: 1, day: 1), DateComponents(year: 1970, month: 1, day: 1), DateComponents(year: 2020, month: 12, day: 31), DateComponents(year: 2020, month: 8, day: 22)]
+        let input = ["01.1.2001", " 01 .01.19 70", "31.12.2020 ", "22. 08.2020"]
+        let expectedComponents = [DateComponents(year: 2001, month: 1, day: 1, hour: 12, minute: 0, nanosecond: 0), DateComponents(year: 1970, month: 1, day: 1, hour: 12, minute: 0, nanosecond: 0), DateComponents(year: 2020, month: 12, day: 31, hour: 12, minute: 0, nanosecond: 0), DateComponents(year: 2020, month: 8, day: 22, hour: 12, minute: 0, nanosecond: 0)]
         for i in 0..<input.count {
             XCTAssertEqual(parser._parseDate(from: input[i]), Calendar.current.date(from: expectedComponents[i]))
         }
@@ -134,11 +141,11 @@ class MarkdownParserTests: XCTestCase {
     func testParseTasks() {
         let input = """
 - [ ] hello
-- [+] (22.08.2020) 1h clean the room
-- [x] (22.08.2020) 0h30min another test!
-- [] (22.08.2020) 5m Yet& another🚀 .task%
+- 22.08.2020 [+] 1h clean the room
+- 22.08.2020 [x] 0h30min another test!
+- 22.08.2020 [] 5m Yet& another🚀 .task%
 """
-        let day = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 22))!
+        let day = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 22, hour: 12, minute: 0, nanosecond: 0))!
         
         let expected = [Task(title: "clean the room", date: day, time: 3600), Task(title: "another test!", date: day, time: 1800), Task(title: "Yet& another .task%", date: day, time: 300)]
         

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import EventKit
 
 extension String {
     // https://stackoverflow.com/questions/24092884/get-nth-character-of-a-string-in-swift-programming-language
@@ -31,3 +32,24 @@ extension NSRegularExpression {
         }
     }
 }
+
+extension EKEvent {
+    open override func isEqual (_ object: Any?) -> Bool {
+        let title = self.title == (object as? EKEvent)?.title
+        let location = self.location == (object as? EKEvent)?.location
+        let calendar = self.calendar == (object as? EKEvent)?.calendar
+        let alarms = self.alarms == (object as? EKEvent)?.alarms
+        let url = self.url == (object as? EKEvent)?.url
+        let startDate = self.startDate == (object as? EKEvent)?.startDate
+        let endDate = self.endDate == (object as? EKEvent)?.endDate
+        let isAllDay = self.isAllDay == (object as? EKEvent)?.isAllDay
+        return title && location && calendar && alarms && url && startDate && endDate && isAllDay
+    }
+    var timeInterval: String {
+        let formatter = DateIntervalFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: startDate, to: endDate)
+    }
+}
+
+extension EKEvent: Identifiable {}

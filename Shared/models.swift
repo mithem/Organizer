@@ -22,3 +22,9 @@ extension Task: Equatable {
         return t1 && d && t2
     }
 }
+
+extension Task: Comparable {
+    static func < (lhs: Task, rhs: Task) -> Bool {
+        return lhs.time > rhs.time
+    }
+}
