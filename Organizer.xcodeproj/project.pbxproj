@@ -7,15 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		490DCEBF24F9393B00AE15CC /* shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4046B24F115A70076F7C4 /* shared.swift */; };
+		490DCEC124F93DD600AE15CC /* EventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490DCEC024F93DD600AE15CC /* EventView.swift */; };
+		490DCEC324F93E0B00AE15CC /* NotScheduledEventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490DCEC224F93E0B00AE15CC /* NotScheduledEventsView.swift */; };
 		4970B62D24F2434A00A2744E /* EventOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4970B62C24F2434A00A2744E /* EventOrganizer.swift */; };
 		4970B62F24F24C3B00A2744E /* EventOrganizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4970B62E24F24C3B00A2744E /* EventOrganizerTests.swift */; };
 		497E95EE24F2B94A00E9097A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497E95ED24F2B94A00E9097A /* SettingsView.swift */; };
+		4989365B24F81784007BBF00 /* NotOrganizedTasksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4989365A24F81784007BBF00 /* NotOrganizedTasksView.swift */; };
+		499AD57424FB6060006506F2 /* constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499AD57324FB6060006506F2 /* constants.swift */; };
+		499AD57624FB6CE7006506F2 /* ModalSheetViewDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499AD57524FB6CE7006506F2 /* ModalSheetViewDataManager.swift */; };
+		499AD57824FB6EA6006506F2 /* NotParsableLinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499AD57724FB6EA6006506F2 /* NotParsableLinesView.swift */; };
 		49A4045A24F1155D0076F7C4 /* OrganizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4044724F115560076F7C4 /* OrganizerApp.swift */; };
 		49A4045C24F1155D0076F7C4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4044824F115560076F7C4 /* ContentView.swift */; };
 		49A4045E24F1155D0076F7C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 49A4044924F1155D0076F7C4 /* Assets.xcassets */; };
 		49A4046924F1157D0076F7C4 /* MarkdownParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4046824F1157D0076F7C4 /* MarkdownParser.swift */; };
 		49A4046F24F115C50076F7C4 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4046E24F115C50076F7C4 /* Extensions.swift */; };
-		49A4048324F11D190076F7C4 /* shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4046B24F115A70076F7C4 /* shared.swift */; };
 		49A4048524F120470076F7C4 /* MarkdownParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4048424F120470076F7C4 /* MarkdownParserTests.swift */; };
 		49A4048724F148770076F7C4 /* models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4048624F148770076F7C4 /* models.swift */; };
 		49A4048B24F17E2A0076F7C4 /* MainScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4048A24F17E2A0076F7C4 /* MainScreen.swift */; };
@@ -32,9 +38,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		490DCEC024F93DD600AE15CC /* EventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventView.swift; sourceTree = "<group>"; };
+		490DCEC224F93E0B00AE15CC /* NotScheduledEventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotScheduledEventsView.swift; sourceTree = "<group>"; };
 		4970B62C24F2434A00A2744E /* EventOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventOrganizer.swift; sourceTree = "<group>"; };
 		4970B62E24F24C3B00A2744E /* EventOrganizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventOrganizerTests.swift; sourceTree = "<group>"; };
 		497E95ED24F2B94A00E9097A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		4989365A24F81784007BBF00 /* NotOrganizedTasksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotOrganizedTasksView.swift; sourceTree = "<group>"; };
+		499AD57324FB6060006506F2 /* constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = constants.swift; sourceTree = "<group>"; };
+		499AD57524FB6CE7006506F2 /* ModalSheetViewDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalSheetViewDataManager.swift; sourceTree = "<group>"; };
+		499AD57724FB6EA6006506F2 /* NotParsableLinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotParsableLinesView.swift; sourceTree = "<group>"; };
 		49A4044724F115560076F7C4 /* OrganizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerApp.swift; sourceTree = "<group>"; };
 		49A4044824F115560076F7C4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		49A4044924F1155D0076F7C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -85,6 +97,7 @@
 				49A4046824F1157D0076F7C4 /* MarkdownParser.swift */,
 				4970B62C24F2434A00A2744E /* EventOrganizer.swift */,
 				49A4046B24F115A70076F7C4 /* shared.swift */,
+				499AD57324FB6060006506F2 /* constants.swift */,
 				49A4046E24F115C50076F7C4 /* Extensions.swift */,
 				49A4048624F148770076F7C4 /* models.swift */,
 			);
@@ -124,6 +137,11 @@
 				49A4044724F115560076F7C4 /* OrganizerApp.swift */,
 				49A4044824F115560076F7C4 /* ContentView.swift */,
 				49A4048A24F17E2A0076F7C4 /* MainScreen.swift */,
+				499AD57724FB6EA6006506F2 /* NotParsableLinesView.swift */,
+				499AD57524FB6CE7006506F2 /* ModalSheetViewDataManager.swift */,
+				490DCEC224F93E0B00AE15CC /* NotScheduledEventsView.swift */,
+				490DCEC024F93DD600AE15CC /* EventView.swift */,
+				4989365A24F81784007BBF00 /* NotOrganizedTasksView.swift */,
 				497E95ED24F2B94A00E9097A /* SettingsView.swift */,
 				49A4044924F1155D0076F7C4 /* Assets.xcassets */,
 			);
@@ -231,11 +249,18 @@
 			files = (
 				4970B62D24F2434A00A2744E /* EventOrganizer.swift in Sources */,
 				49A4048B24F17E2A0076F7C4 /* MainScreen.swift in Sources */,
+				490DCEC124F93DD600AE15CC /* EventView.swift in Sources */,
 				497E95EE24F2B94A00E9097A /* SettingsView.swift in Sources */,
 				49A4048724F148770076F7C4 /* models.swift in Sources */,
+				490DCEC324F93E0B00AE15CC /* NotScheduledEventsView.swift in Sources */,
+				499AD57424FB6060006506F2 /* constants.swift in Sources */,
+				499AD57624FB6CE7006506F2 /* ModalSheetViewDataManager.swift in Sources */,
 				49A4046F24F115C50076F7C4 /* Extensions.swift in Sources */,
+				4989365B24F81784007BBF00 /* NotOrganizedTasksView.swift in Sources */,
+				490DCEBF24F9393B00AE15CC /* shared.swift in Sources */,
 				49A4045C24F1155D0076F7C4 /* ContentView.swift in Sources */,
 				49A4045A24F1155D0076F7C4 /* OrganizerApp.swift in Sources */,
+				499AD57824FB6EA6006506F2 /* NotParsableLinesView.swift in Sources */,
 				49A4046924F1157D0076F7C4 /* MarkdownParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -244,7 +269,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				49A4048324F11D190076F7C4 /* shared.swift in Sources */,
 				49A4048524F120470076F7C4 /* MarkdownParserTests.swift in Sources */,
 				4970B62F24F24C3B00A2744E /* EventOrganizerTests.swift in Sources */,
 			);
