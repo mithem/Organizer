@@ -16,25 +16,27 @@ struct MarkdownParser {
     static let taskRegex = NSRegularExpression(#"- (?<date>\d\d\.\d\d\.\d\d\d\d )?\[[+ x]?\] (?<title>"# + _singleWordChar + #"+)"#)
     static let taskNameRegex = NSRegularExpression(#"^ ?((?<n1>\d\d?)(?<u>h|(min|m))(( )?(?<n2>\d\d?)(min|m))?)? ?(?<title>"# + _singleWordChar + #"*)$"#)
     
-    func parseTasks(from text: String) -> [Task] {
+    func parseTasks(from text: String) -> (tasks: [Task], notParsableLines: [String]) {
         let text = MarkdownParser._emojiRegex.stringByReplacingMatches(in: text, range: NSRange(location: 0, length: text.count), withTemplate: "")
         
         var tasks = [Task]()
+        var notParsableLines = [String]()
         for line in text.split(separator: "\n").map({String($0)}) {
-            guard let result = MarkdownParser.taskRegex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) else { continue }
+            guard let result = MarkdownParser.taskRegex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) else { notParsableLines.append(line); continue }
             var nsRange = result.range(withName: "title")
-            guard let range = Range(nsRange) else { continue }
+            guard let range = Range(nsRange) else { notParsableLines.append(line); continue }
             let title = String(line[range])
             nsRange = result.range(withName: "date")
-            guard let dateRange = Range(nsRange) else { continue }
-            guard let taskDate = _parseDate(from: String(line[dateRange])) else { continue }
+            guard let dateRange = Range(nsRange) else { notParsableLines.append(line); continue }
+            guard let taskDate = _parseDate(from: String(line[dateRange])) else { notParsableLines.append(line); continue }
             let timeAndTitle = _getTimeInterval(from: title)
-            guard let newTime = timeAndTitle.time else { continue }
-            guard let newTitle = timeAndTitle.title else { continue }
+            guard let newTime = timeAndTitle.time else { notParsableLines.append(line); continue }
+            guard let newTitle = timeAndTitle.title else { notParsableLines.append(line); continue }
             let task = Task(title: newTitle, date: taskDate, time: newTime)
             tasks.append(task)
         }
-        return tasks
+        
+        return (tasks: tasks, notParsableLines: notParsableLines)
     }
     
     func _parseDate(from: String) -> Date? {

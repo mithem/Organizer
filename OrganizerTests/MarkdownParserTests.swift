@@ -149,7 +149,7 @@ class MarkdownParserTests: XCTestCase {
         
         let expected = [Task(title: "clean the room", date: day, time: 3600), Task(title: "another test!", date: day, time: 1800), Task(title: "Yet& another .task%", date: day, time: 300)]
         
-        let results = parser.parseTasks(from: input)
+        let results = parser.parseTasks(from: input).tasks
         XCTAssertEqual(results, expected)
     }
 }

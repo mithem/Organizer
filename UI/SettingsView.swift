@@ -9,14 +9,15 @@ import SwiftUI
 
 struct SettingsView: View {
     
-    @AppStorage("showCalendarAppAfterExport") var showCalendarAppAFterExport: Bool = false
+    @AppStorage(UserDefaultsKeys.showCalendarAppAfterExport) var showCalendarAppAFterExport = false
+    @AppStorage(UserDefaultsKeys.clearEventsAfterExport) var clearEventsAfterExport = true
     
     var body: some View {
-        ScrollView {
+        Form {
             Toggle("Show calendar app after export", isOn: $showCalendarAppAFterExport)
-                .padding(.horizontal)
+            Toggle("Clear parsed events after export", isOn: $clearEventsAfterExport)
         }
-        .navigationTitle("Settigs")
+        .navigationTitle("Settings")
     }
 }
 

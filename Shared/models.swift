@@ -14,6 +14,14 @@ struct Task: Identifiable {
     var time: TimeInterval
 }
 
+extension Task {
+    var dateInterval: String {
+        let formatter = DateIntervalFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: date, to: date + time)
+    }
+}
+
 extension Task: Equatable {
     static func == (lhs: Task, rhs: Task) -> Bool {
         let t1 = lhs.title == rhs.title
