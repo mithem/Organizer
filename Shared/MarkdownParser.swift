@@ -16,12 +16,15 @@ struct MarkdownParser {
     static let taskRegex = NSRegularExpression(#"- (?<date>\d\d\.\d\d\.\d\d\d\d )?\[[+ x]?\] (?<title>"# + _singleWordChar + #"+)"#)
     static let taskNameRegex = NSRegularExpression(#"^ ?((?<n1>\d\d?)(?<u>h|(min|m))(( )?(?<n2>\d\d?)(min|m))?)? ?(?<title>"# + _singleWordChar + #"*)$"#)
     
-    func parseTasks(from text: String) -> (tasks: [Task], notParsableLines: [String]) {
+    func parseTasks(from text: String, progressCallback: (Float) -> Void) -> (tasks: [Task], notParsableLines: [String]) {
+        progressCallback(0.0)
         let text = MarkdownParser._emojiRegex.stringByReplacingMatches(in: text, range: NSRange(location: 0, length: text.count), withTemplate: "")
         
         var tasks = [Task]()
         var notParsableLines = [String]()
-        for line in text.split(separator: "\n").map({String($0)}) {
+        let lines = text.split(separator: "\n").map({String($0)})
+        var lineIdx = 0
+        for line in lines {
             guard let result = MarkdownParser.taskRegex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) else { notParsableLines.append(line); continue }
             var nsRange = result.range(withName: "title")
             guard let range = Range(nsRange) else { notParsableLines.append(line); continue }
@@ -34,8 +37,11 @@ struct MarkdownParser {
             guard let newTitle = timeAndTitle.title else { notParsableLines.append(line); continue }
             let task = Task(title: newTitle, date: taskDate, time: newTime)
             tasks.append(task)
+            lineIdx += 1
+            progressCallback(Float(lineIdx / lines.count))
         }
         
+        progressCallback(1.0)
         return (tasks: tasks, notParsableLines: notParsableLines)
     }
     

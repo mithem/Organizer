@@ -41,7 +41,8 @@ struct EventOrganizer {
         return results
     }
     
-    func organize(tasks: [Task], with store: EKEventStore, for calendar: EKCalendar) -> (events: [EKEvent], notOrganizedTasks: [Task]) {
+    func organize(tasks: [Task], with store: EKEventStore, for calendar: EKCalendar, progressCallback: (Float) -> Void) -> (events: [EKEvent], notOrganizedTasks: [Task]) {
+        progressCallback(0.0)
         var events = [EKEvent]()
         var event: EKEvent
         var dateCursor: Date
@@ -49,6 +50,7 @@ struct EventOrganizer {
         var task: Task
         var idxCursor = 0
         var sorted = tasks.sorted()
+        let totalCount = sorted.count
         guard let first = sorted.first else { return (events: [], notOrganizedTasks: sorted) }
         var limits = _getLimits(for: first)
         var limitIdx = 0
@@ -56,6 +58,9 @@ struct EventOrganizer {
         var limit2: Date
         var tempLimits: [(Date, Date)]
         var notOrganized = [Task]()
+        var progress: Float {
+            Float(notOrganized.count + events.count) / Float(totalCount)
+        }
         
         while limits.count > limitIdx {
             limit1 = limits[limitIdx].0
@@ -102,6 +107,7 @@ struct EventOrganizer {
                         }
                     }
                 }
+                progressCallback(progress)
             }
             limitIdx += 1
         }

@@ -70,7 +70,7 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
         if let strings = UIPasteboard.general.strings {
             let parser = MarkdownParser()
             for string in strings {
-                let (t, notParsableLines) = parser.parseTasks(from: string)
+                let (t, notParsableLines) = parser.parseTasks(from: string, progressCallback: {delegate.updateProgress($0 * Float(1 / 3))})
                 tasks.append(contentsOf: t)
                 notParsable.append(contentsOf: notParsableLines)
             }
@@ -82,7 +82,7 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
     } else {
         if let calendar = delegate.calendar {
             let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)])
-            let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar)
+            let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * Float(1/3)))})
             delegate.finishedOrganizing(events: events, notOrganizedTasks: notOrganizedTasks, notParsableLines: notParsable)
         }
     }
@@ -95,22 +95,26 @@ protocol CopyFromPasteboardAndOrganizeTasksDelegate {
     func beginOrganizing()
     func finishedOrganizing(events: [EKEvent], notOrganizedTasks: [Task], notParsableLines: [String])
     func didNotFindValidMarkdown()
+    func updateProgress(_ progress: Float)
 }
 
 func exportToCalendar(events: [EKEvent], delegate: ExportToCalendarDelegate) {
     delegate.beginExport()
     var unexportedItems = [EKEvent]()
+    var idx = 0
     for event in events {
         do {
             try delegate.store.save(event, span: EKSpan.thisEvent, commit: true)
-            print("Saved event.")
+            idx += 1
+            delegate.updateProgress(0.66666 + (Float(idx) / Float(events.count)))
         } catch {
             print(error)
             unexportedItems.append(event)
         }
     }
     if UserDefaults().bool(forKey: UserDefaultsKeys.showCalendarAppAfterExport) {
-        let timestamp = events.first!.startDate.timeIntervalSinceReferenceDate
+        guard let first = events.first else { delegate.exportComplete(unexportedItems: events, showActionSheet: false); return }
+        let timestamp = first.startDate.timeIntervalSinceReferenceDate
         delegate.exportComplete(unexportedItems: unexportedItems, showActionSheet: false)
         UIApplication.shared.open(URL(string: "calshow:\(timestamp)")!)
     } else {
@@ -123,4 +127,5 @@ protocol ExportToCalendarDelegate {
     
     func beginExport()
     func exportComplete(unexportedItems: [EKEvent], showActionSheet: Bool)
+    func updateProgress(_ progress: Float)
 }
