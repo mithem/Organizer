@@ -42,7 +42,7 @@ class EventOrganizerTests: XCTestCase {
         
         let tasks = [Task(title: "My task", date: date, time: 10 * 60)]
         
-        let results = organizer.organize(tasks: tasks, with: store, for: calendar)
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
         
         let e = EKEvent(eventStore: store)
         e.title = "My task"
@@ -81,7 +81,7 @@ class EventOrganizerTests: XCTestCase {
             Task(title: "Another one!", date: date + 3600, time: 2700)
         ]
         
-        let results = organizer.organize(tasks: tasks, with: store, for: calendar)
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
         
         let e1 = EKEvent(eventStore: store)
         e1.title = "Some important task"
@@ -120,7 +120,7 @@ class EventOrganizerTests: XCTestCase {
             Task(title: "Hello, there!", date: date, time: 45 * 60)
         ]
         
-        let results = organizer.organize(tasks: tasks, with: store, for: calendar)
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
         
         begin.year = 2020
         begin.month = 8
@@ -164,7 +164,7 @@ class EventOrganizerTests: XCTestCase {
             Task(title: "One day later...", date: date, time: 10 * 60)
         ]
         
-        let results = organizer.organize(tasks: tasks, with: store, for: calendar)
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
         
         begin.year = 2020
         begin.month = 8
@@ -220,7 +220,7 @@ class EventOrganizerTests: XCTestCase {
             Task(title: "Session 2", date: date, time: 7200)
         ]
         
-        let results = organizer.organize(tasks: tasks, with: store, for: calendar)
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
         
         begin1.year = 2020
         begin1.month = 8

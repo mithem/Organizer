@@ -55,16 +55,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D90A325C-F6C0-407D-86E7-782864567104"
+            uuid = "712D0FF3-C1A1-4CE6-A031-6751E78CEB62"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "UI/MainScreen.swift"
+            filePath = "OrganizerTests/MarkdownParserTests.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "77"
-            endingLineNumber = "77"
-            landmarkName = "updateProgress(_:)"
+            startingLineNumber = "158"
+            endingLineNumber = "158"
+            landmarkName = "testParseTasks()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

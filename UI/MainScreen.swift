@@ -66,14 +66,13 @@ struct MainScreen: View {
         progressDescription = "Parsing tasks"
         let beginComponents = Calendar.current.dateComponents([.hour, .minute], from: beginning)
         let endComponents = Calendar.current.dateComponents([.hour, .minute], from: end)
-        DispatchQueue.main.async {
-            copyFromPasteboardAndOrganizeTasks(delegate: self, beginComponents: beginComponents, endComponents: endComponents)
-        }
+        copyFromPasteboardAndOrganizeTasks(delegate: self, beginComponents: beginComponents, endComponents: endComponents)
     }
 }
 
 extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
     func updateProgress(_ progress: Float) {
+        print("Updating progress: \(progress)")
         progressValue = progress
     }
     

@@ -13,25 +13,35 @@ struct MarkdownParser {
     
     static let _emojiRegex = NSRegularExpression("[\\U00010000-\\U0010FFFF]")
     static let _singleWordChar = #"[\w\s\d@ß?=!\^°\"\'§\$,&\.%\/\(\)]"#
-    static let taskRegex = NSRegularExpression(#"- (?<date>\d\d\.\d\d\.\d\d\d\d )?\[[+ x]?\] (?<title>"# + _singleWordChar + #"+)"#)
-    static let taskNameRegex = NSRegularExpression(#"^ ?((?<n1>\d\d?)(?<u>h|(min|m))(( )?(?<n2>\d\d?)(min|m))?)? ?(?<title>"# + _singleWordChar + #"*)$"#)
+    static let taskRegex = NSRegularExpression(#"^- (?<date>\d\d\.\d\d\.\d\d\d\d )?\[[+ x]?\] (?<title>.+?)( \(\d\d\.\d\d\.\d\d\d\d\))?$"#)
+    static let taskNameRegex = NSRegularExpression(#"^ ?((?<n1>\d\d?)(?<u>h|(min|m))(( )?(?<n2>\d\d?)(min|m))?)? ?(?<title>.*)$"#)
     
-    func parseTasks(from text: String, progressCallback: (Float) -> Void) -> (tasks: [Task], notParsableLines: [String]) {
-        progressCallback(0.0)
-        let text = MarkdownParser._emojiRegex.stringByReplacingMatches(in: text, range: NSRange(location: 0, length: text.count), withTemplate: "")
+    func parseTasks(from input: String, progressCallback: (Float) -> Void) -> (tasks: [Task], notParsableLines: [String]) {
+        let text = MarkdownParser._emojiRegex.stringByReplacingMatches(in: input, range: NSRange(location: 0, length: input.count), withTemplate: "")
         
+        let currentDate = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Date()))!
         var tasks = [Task]()
         var notParsableLines = [String]()
         let lines = text.split(separator: "\n").map({String($0)})
         var lineIdx = 0
+        var taskDate: Date
         for line in lines {
             guard let result = MarkdownParser.taskRegex.firstMatch(in: line, range: NSRange(location: 0, length: line.count)) else { notParsableLines.append(line); continue }
             var nsRange = result.range(withName: "title")
             guard let range = Range(nsRange) else { notParsableLines.append(line); continue }
             let title = String(line[range])
             nsRange = result.range(withName: "date")
-            guard let dateRange = Range(nsRange) else { notParsableLines.append(line); continue }
-            guard let taskDate = _parseDate(from: String(line[dateRange])) else { notParsableLines.append(line); continue }
+            if let dateRange = Range(nsRange) {
+                if let d = _parseDate(from: String(line[dateRange])) {
+                    taskDate = d
+                }
+                else {
+                    notParsableLines.append(line)
+                    continue
+                }
+            } else {
+                taskDate = currentDate
+            }
             let timeAndTitle = _getTimeInterval(from: title)
             guard let newTime = timeAndTitle.time else { notParsableLines.append(line); continue }
             guard let newTitle = timeAndTitle.title else { notParsableLines.append(line); continue }
@@ -41,7 +51,7 @@ struct MarkdownParser {
             progressCallback(Float(lineIdx / lines.count))
         }
         
-        progressCallback(1.0)
+        progressCallback(Float(1) / Float(3))
         return (tasks: tasks, notParsableLines: notParsableLines)
     }
     
