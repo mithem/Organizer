@@ -10,12 +10,22 @@ import SwiftUI
 struct SettingsView: View {
     
     @AppStorage(UserDefaultsKeys.showCalendarAppAfterExport) var showCalendarAppAFterExport = false
-    @AppStorage(UserDefaultsKeys.clearEventsAfterExport) var clearEventsAfterExport = true
+    @AppStorage(UserDefaultsKeys.pauseEveryTimeInterval) var pauseEvery = PauseEveryTimeInterval.h3.rawValue
+    @AppStorage(UserDefaultsKeys.pauseLengthTimeInterval) var pauseLength = PauseLengthTimeInterval.min45.rawValue
     
     var body: some View {
         Form {
             Toggle("Show calendar app after export", isOn: $showCalendarAppAFterExport)
-            Toggle("Clear parsed events after export", isOn: $clearEventsAfterExport)
+            Picker("Pause every", selection: $pauseEvery) {
+                ForEach(PauseEveryTimeInterval.allCases) { value in
+                    Text(value.rawValue).tag(value.rawValue)
+                }
+            }
+            Picker("Pause length", selection: $pauseLength) {
+                ForEach(PauseLengthTimeInterval.allCases) { value in
+                    Text(value.rawValue).tag(value)
+                }
+            }
         }
         .navigationTitle("Settings")
     }

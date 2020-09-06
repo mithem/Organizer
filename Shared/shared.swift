@@ -16,7 +16,7 @@ func checkAuthStatus(with store: EKEventStore) {
         print("Not determined")
         store.requestAccess(to: .event) { success, error in
             if success {
-                checkForCalendar(with: store) { _ in }
+                _ = checkForCalendar(with: store)
             } else {
                 print("Unsucessful")
             }
@@ -35,10 +35,10 @@ func checkAuthStatus(with store: EKEventStore) {
     }
 }
 
-func checkForCalendar(with store: EKEventStore, callback: (EKCalendar) -> Void) {
+func checkForCalendar(with store: EKEventStore) -> EKCalendar {
     if let identifier = UserDefaults().string(forKey: "calendarIdentifier") {
         if let calendar = store.calendar(withIdentifier: identifier) {
-            callback(calendar)
+            return calendar
         } else {
             return createCalendar(with: store)
         }
@@ -47,7 +47,7 @@ func checkForCalendar(with store: EKEventStore, callback: (EKCalendar) -> Void) 
     }
 }
 
-func createCalendar(with store: EKEventStore) {
+func createCalendar(with store: EKEventStore) -> EKCalendar {
     let calendar = EKCalendar(for: .event, eventStore: store)
     calendar.title = "Organizer"
     calendar.source = store.sources.filter{
@@ -61,9 +61,15 @@ func createCalendar(with store: EKEventStore) {
     } catch {
         print("Error saving calendar: \(error)")
     }
+    return calendar
 }
 
 func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents) {
+    func organize(with calendar: EKCalendar) {
+        let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)])
+        let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * Float(1/3)))})
+        delegate.finishedOrganizing(events: events, notOrganizedTasks: notOrganizedTasks, notParsableLines: notParsable)
+    }
     var tasks = [Task]()
     var notParsable = [String]()
     if UIPasteboard.general.hasStrings {
@@ -80,16 +86,12 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
     if tasks.count == 0 {
         delegate.didNotFindValidMarkdown()
     } else {
-        if let calendar = delegate.calendar {
-            let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)])
-            let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * Float(1/3)))})
-            delegate.finishedOrganizing(events: events, notOrganizedTasks: notOrganizedTasks, notParsableLines: notParsable)
-        }
+        let calendar = checkForCalendar(with: delegate.store)
+        organize(with: calendar)
     }
 }
 
 protocol CopyFromPasteboardAndOrganizeTasksDelegate {
-    var calendar: EKCalendar? { get }
     var store: EKEventStore { get }
     
     func beginOrganizing()

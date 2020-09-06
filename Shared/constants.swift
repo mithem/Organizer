@@ -25,7 +25,10 @@ var eventsForPreview: [EKEvent] {
     return events
 }
 
+let tasksForPreview = [Task(title: "My 1st task!", date: Date() + 60, time: 180), Task(title: "Another one!", date: Date() + 1800, time: 600)]
+
 struct UserDefaultsKeys {
     static let showCalendarAppAfterExport = "showCalendarAppAfterExport"
-    static let clearEventsAfterExport = "clearEventsAfterExport"
+    static let pauseEveryTimeInterval = "pauseEveryTimeInterval"
+    static let pauseLengthTimeInterval = "pauseLengthTimeInterval"
 }

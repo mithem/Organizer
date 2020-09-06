@@ -29,7 +29,7 @@ class EventOrganizerTests: XCTestCase {
     
     func testOrganizeVerySimple() {
         
-        let organizer = EventOrganizer(dateComponentsForLimits: [(DateComponents(hour: 0, minute: 0), DateComponents(hour: 23, minute: 59))])
+        let organizer = EventOrganizer(dateComponentsForLimits: [(DateComponents(hour: 0, minute: 0), DateComponents(hour: 23, minute: 59))], pauseEvery: 18000, pauseLength: 0)
         let store = EKEventStore()
         let calendar = EKCalendar(for: .event, eventStore: store)
         
@@ -252,5 +252,65 @@ class EventOrganizerTests: XCTestCase {
         XCTAssertEqual(results.events, expected)
         
         XCTAssertEqual(results.notOrganizedTasks, [])
+    }
+    
+    func testOrganizeWithPauses() {
+        
+        let store = EKEventStore()
+        let calendar = EKCalendar(for: .event, eventStore: store)
+        
+        var dateComponents = DateComponents()
+        dateComponents.year = 2020
+        dateComponents.month = 8
+        dateComponents.day = 23
+        
+        let date = Calendar.current.date(from: dateComponents)!
+        var begin = DateComponents(hour: 8)
+        var end = DateComponents(hour: 13)
+        let organizer = EventOrganizer(dateComponentsForLimits: [(begin, end)], pauseEvery: 7200, pauseLength: 3600)
+        
+        let tasks = [
+            Task(title: "Session 1.1", date: date, time: 3600),
+            Task(title: "Session 1.2", date: date, time: 3600),
+            Task(title: "Session 2.1", date: date, time: 3600),
+            Task(title: "Session 2.2", date: date, time: 3600)
+        ]
+        
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
+        
+        begin.year = 2020
+        begin.month = 8
+        begin.day = 23
+        end.year = 2020
+        end.month = 8
+        end.day = 23
+        
+        let e1 = EKEvent(eventStore: store)
+        e1.title = "Session 1.1"
+        e1.calendar = calendar
+        e1.startDate = Calendar.current.date(from: begin)!
+        e1.endDate = e1.startDate + 3600
+        
+        let e2 = EKEvent(eventStore: store)
+        e2.title = "Session 1.2"
+        e2.calendar = calendar
+        e2.startDate = Calendar.current.date(from: begin)! + 3600
+        e2.endDate = e2.startDate + 3600
+        
+        let e3 = EKEvent(eventStore: store)
+        e3.title = "Session 2.1"
+        e3.calendar = calendar
+        e3.startDate = Calendar.current.date(from: end)! - 7200
+        e3.endDate = e3.startDate + 3600
+        
+        let e4 = EKEvent(eventStore: store)
+        e4.title = "Session 2.2"
+        e4.calendar = calendar
+        e4.startDate = Calendar.current.date(from: end)! - 3600
+        e4.endDate = e4.startDate + 3600
+        
+        let expected = [e1, e2, e3, e4]
+        
+        XCTAssertEqual(results.events, expected)
     }
 }

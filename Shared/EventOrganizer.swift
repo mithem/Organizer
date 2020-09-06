@@ -11,6 +11,22 @@ import EventKit
 struct EventOrganizer {
     
     let dateComponentsForLimits: [(DateComponents, DateComponents)]
+    let pauseEvery: TimeInterval
+    let pauseLength: TimeInterval
+    
+    init(dateComponentsForLimits: [(DateComponents, DateComponents)], pauseEvery: TimeInterval? = nil, pauseLength: TimeInterval? = nil) {
+        self.dateComponentsForLimits = dateComponentsForLimits
+        if let pauseEvery = pauseEvery {
+            self.pauseEvery = pauseEvery
+        } else {
+            self.pauseEvery = (PauseEveryTimeInterval(rawValue: UserDefaults().string(forKey: UserDefaultsKeys.pauseEveryTimeInterval) ?? "2h") ?? PauseEveryTimeInterval.h2).timeInterval
+        }
+        if let pauseLength = pauseLength {
+            self.pauseLength = pauseLength
+        } else {
+            self.pauseLength = (PauseLengthTimeInterval(rawValue: UserDefaults().string(forKey: UserDefaultsKeys.pauseLengthTimeInterval) ?? "45 min") ?? PauseLengthTimeInterval.min45).timeInterval
+        }
+    }
     
     func _getLimits(for task: Task) -> [(Date, Date)] {
         var results = [(Date, Date)]()
@@ -61,6 +77,7 @@ struct EventOrganizer {
         var progress: Float {
             Float(notOrganized.count + events.count) / Float(totalCount)
         }
+        var workingSince: TimeInterval = 0
         
         while limits.count > limitIdx {
             limit1 = limits[limitIdx].0
@@ -69,6 +86,10 @@ struct EventOrganizer {
             while sorted.count > 0 {
                 if idxCursor >= sorted.count {
                     break
+                }
+                if workingSince >= pauseEvery {
+                    dateCursor += pauseLength
+                    workingSince = 0
                 }
                 task = sorted[idxCursor]
                 tempLimits = _getLimits(for: task)
@@ -96,6 +117,7 @@ struct EventOrganizer {
                     event.startDate = dateCursor
                     event.endDate = endDate
                     event.calendar = calendar
+                    workingSince += task.time
                     events.append(event)
                     dateCursor = endDate
                     sorted.remove(at: idxCursor)

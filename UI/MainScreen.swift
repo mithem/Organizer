@@ -17,20 +17,19 @@ struct MainScreen: View {
     @State private var end = Date(timeIntervalSinceNow: 15 * 60)
     
     @State private var events = [EKEvent]()
-    @State private var notParsableLines = [String]()
-    @State private var notOrganizedTasks = [Task]()
-    @State private var notScheduledEvents = [EKEvent]()
     
     @State private var progressValue: Float = 0
     @State private var progressDescription = "Parse first."
     
+    @State private var pauseEvery = PauseEveryTimeInterval.h2
+    
+    @ObservedObject var unsuccessfulDataManager = UnsuccessfulDataManager()
+    
+    @State private var showingUnsuccessfulDataView = false
+    
     let store = EKEventStore()
-    var calendar: EKCalendar?
     
     init() {
-        checkForCalendar(with: store) { calendar in
-            self.calendar = calendar
-        }
         checkAuthStatus(with: store)
     }
     
@@ -52,6 +51,9 @@ struct MainScreen: View {
                 Button("Parse from clipboard/pasteboard") {
                     parseFromPasteboardAndOrganize()
                 }
+                .sheet(isPresented: $showingUnsuccessfulDataView) {
+                    UnsuccessfulDataView(manager: unsuccessfulDataManager)
+                }
             }
             .listStyle(InsetGroupedListStyle())
             .navigationBarItems(trailing: NavigationLink("Settings", destination: SettingsView()))
@@ -72,7 +74,6 @@ struct MainScreen: View {
 
 extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
     func updateProgress(_ progress: Float) {
-        print("Updating progress: \(progress)")
         progressValue = progress
     }
     
@@ -84,9 +85,9 @@ extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
     
     func finishedOrganizing(events: [EKEvent], notOrganizedTasks: [Task], notParsableLines: [String]) {
         progressValue = 0.66666
+        unsuccessfulDataManager.notOrganizedTasks = notOrganizedTasks
+        unsuccessfulDataManager.notParsableLines = notParsableLines
         self.events = events
-        self.notOrganizedTasks = notOrganizedTasks
-        self.notParsableLines = notParsableLines
         
         exportToCalendar(events: self.events, delegate: self)
     }
@@ -98,17 +99,19 @@ extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
 
 extension MainScreen: ExportToCalendarDelegate {
     func beginExport() {
-        progressDescription = "Exporting events"
+        progressDescription = "Exporting \(events.count) events"
     }
     
     func exportComplete(unexportedItems: [EKEvent], showActionSheet: Bool) {
         progressValue = 1
-        self.notScheduledEvents = unexportedItems
+        unsuccessfulDataManager.notScheduledEvents = unexportedItems
         if showActionSheet && unexportedItems.count < events.count {
             showingExportSuccessfulActionSheet = true
         }
-        progressValue = 0.0
-        progressDescription = "Exported events."
+        progressDescription = "Exported \(events.count - unexportedItems.count) events."
+        if unsuccessfulDataManager.hasItems {
+            showingUnsuccessfulDataView = true
+        }
     }
 }
 
