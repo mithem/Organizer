@@ -100,7 +100,7 @@ protocol CopyFromPasteboardAndOrganizeTasksDelegate {
     func updateProgress(_ progress: Float)
 }
 
-func exportToCalendar(events: [EKEvent], delegate: ExportToCalendarDelegate) {
+func exportToCalendar(events: [EKEvent], delegate: ExportToCalendarDelegate, showCalendar: Bool? = nil) {
     delegate.beginExport()
     var unexportedItems = [EKEvent]()
     var idx = 0
@@ -114,7 +114,7 @@ func exportToCalendar(events: [EKEvent], delegate: ExportToCalendarDelegate) {
             unexportedItems.append(event)
         }
     }
-    if UserDefaults().bool(forKey: UserDefaultsKeys.showCalendarAppAfterExport) {
+    if showCalendar == true || showCalendar == nil ? (UserDefaults().bool(forKey: UserDefaultsKeys.showCalendarAppAfterExport)) : false {
         guard let first = events.first else { delegate.exportComplete(unexportedItems: events, showActionSheet: false); return }
         let timestamp = first.startDate.timeIntervalSinceReferenceDate
         delegate.exportComplete(unexportedItems: unexportedItems, showActionSheet: false)

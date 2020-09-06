@@ -21,8 +21,6 @@ struct MainScreen: View {
     @State private var progressValue: Float = 0
     @State private var progressDescription = "Parse first."
     
-    @State private var pauseEvery = PauseEveryTimeInterval.h2
-    
     @ObservedObject var unsuccessfulDataManager = UnsuccessfulDataManager()
     
     @State private var showingUnsuccessfulDataView = false
@@ -55,13 +53,13 @@ struct MainScreen: View {
                     UnsuccessfulDataView(manager: unsuccessfulDataManager)
                 }
             }
-            .listStyle(InsetGroupedListStyle())
             .navigationBarItems(trailing: NavigationLink("Settings", destination: SettingsView()))
             .navigationTitle("Organizer")
             .actionSheet(isPresented: $showingDidNotFindValidMarkdownActionSheet) {
                 ActionSheet(title: Text("No data found"), message: Text("Unable to find valid markdown from Things."), buttons: [.default(Text("OK"))])
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     func parseFromPasteboardAndOrganize() {
@@ -89,7 +87,7 @@ extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
         unsuccessfulDataManager.notParsableLines = notParsableLines
         self.events = events
         
-        exportToCalendar(events: self.events, delegate: self)
+        exportToCalendar(events: self.events, delegate: self, showCalendar: (notOrganizedTasks.isEmpty && notParsableLines.isEmpty) ? nil : false)
     }
     
     func didNotFindValidMarkdown() {
