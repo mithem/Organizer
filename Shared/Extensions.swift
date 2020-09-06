@@ -53,3 +53,9 @@ extension EKEvent {
 }
 
 extension EKEvent: Identifiable {}
+
+extension EKEvent: Comparable {
+    public static func < (lhs: EKEvent, rhs: EKEvent) -> Bool {
+        return lhs.startDate < rhs.startDate
+    }
+}

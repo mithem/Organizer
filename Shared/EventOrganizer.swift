@@ -57,7 +57,26 @@ struct EventOrganizer {
         return results
     }
     
+    func _sortTasks(_ tasks: [Task]) -> [Task] {
+        guard tasks.count > 0 else { return [] }
+        var taskDict = [Date: [Task]]()
+        var result = [Task]()
+        for task in tasks {
+                if taskDict[task.date] == nil {
+                    taskDict[task.date] = [task]
+                } else {
+                    taskDict[task.date]?.append(task)
+                }
+        }
+        let sortedKeys = Array(taskDict.keys).sorted()
+        for key in sortedKeys {
+            result.append(contentsOf: taskDict[key]!.sorted())
+        }
+        return result
+    }
+    
     func organize(tasks: [Task], with store: EKEventStore, for calendar: EKCalendar, progressCallback: (Float) -> Void) -> (events: [EKEvent], notOrganizedTasks: [Task]) {
+        struct StopIteration: Error {}
         progressCallback(0.0)
         var events = [EKEvent]()
         var event: EKEvent
@@ -65,7 +84,7 @@ struct EventOrganizer {
         var endDate: Date
         var task: Task
         var idxCursor = 0
-        var sorted = tasks.sorted()
+        var sorted = _sortTasks(tasks)
         let totalCount = sorted.count
         guard let first = sorted.first else { return (events: [], notOrganizedTasks: sorted) }
         var limits = _getLimits(for: first)
@@ -79,7 +98,7 @@ struct EventOrganizer {
         }
         var workingSince: TimeInterval = 0
         
-        while limits.count > limitIdx {
+        outer: while limits.count > limitIdx {
             limit1 = limits[limitIdx].0
             limit2 = limits[limitIdx].1
             dateCursor = limit1
@@ -98,6 +117,7 @@ struct EventOrganizer {
                     limit1 = limits[limitIdx].0
                     limit2 = limits[limitIdx].1
                     dateCursor = limit1
+                    workingSince = 0
                 }
                 endDate = dateCursor + task.time
                 if endDate > limit2 {
@@ -125,7 +145,7 @@ struct EventOrganizer {
                         if sorted.count > 0 {
                             idxCursor -= 1
                         } else {
-                            return (events: events, notOrganizedTasks: notOrganized)
+                            break outer
                         }
                     }
                 }
@@ -133,6 +153,7 @@ struct EventOrganizer {
             }
             limitIdx += 1
         }
+        events.sort()
         return (events: events, notOrganizedTasks: notOrganized)
     }
 }

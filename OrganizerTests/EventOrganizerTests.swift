@@ -11,6 +11,7 @@ import EventKit
 
 class EventOrganizerTests: XCTestCase {
     
+    // MARK: Get limits
     func testGetLimits() {
         let organizer = EventOrganizer(dateComponentsForLimits: [(DateComponents(hour: 10), DateComponents(hour: 12))])
         
@@ -27,6 +28,36 @@ class EventOrganizerTests: XCTestCase {
         }
     }
     
+    // MARK: Sort tasks
+    func testSortTasks() {
+        let organizer = EventOrganizer(dateComponentsForLimits: []) // irrelevant
+        
+        var dateComponents1 = DateComponents()
+        dateComponents1.year = 2020
+        dateComponents1.month = 8
+        dateComponents1.day = 23
+        
+        var dateComponents2 = DateComponents()
+        dateComponents2.year = 2020
+        dateComponents2.month = 8
+        dateComponents2.day = 25
+        
+        let day1 = Calendar.current.date(from: dateComponents1)!
+        let day2 = Calendar.current.date(from: dateComponents2)!
+        
+        let t1 = Task(title: "Task 1", date: day2, time: 3600)
+        let t2 = Task(title: "Task 2", date: day1, time: 1800)
+        let t3 = Task(title: "Task 3", date: day2, time: 4000)
+        let t4 = Task(title: "Task 4", date: day1, time: 2700)
+        let t5 = Task(title: "Task 5", date: day2, time: 4500)
+        let t6 = Task(title: "Task 6", date: day1, time: 200)
+        
+        let result = organizer._sortTasks([t1, t2, t3, t4, t5, t6])
+        
+        XCTAssertEqual(result, [t4, t2, t6, t5, t3, t1])
+    }
+    
+    // MARK: Organize very simple
     func testOrganizeVerySimple() {
         
         let organizer = EventOrganizer(dateComponentsForLimits: [(DateComponents(hour: 0, minute: 0), DateComponents(hour: 23, minute: 59))], pauseEvery: 18000, pauseLength: 0)
@@ -55,6 +86,7 @@ class EventOrganizerTests: XCTestCase {
         XCTAssertEqual(results.events, expected)
     }
     
+    // MARK: Organize simple
     func testOrganizeSimple() {
         let store = EKEventStore()
         let calendar = EKCalendar(for: .event, eventStore: store)
@@ -100,6 +132,7 @@ class EventOrganizerTests: XCTestCase {
         XCTAssertEqual(results.events, expected)
     }
     
+    // MARK: Organize medium
     func testOrganizeMedium() {
         
         let store = EKEventStore()
@@ -142,6 +175,7 @@ class EventOrganizerTests: XCTestCase {
         XCTAssertEqual(results.notOrganizedTasks, [tasks.first!])
     }
     
+    // MARK: Organize medium+
     func testOrganizeMediumPlus() {
         
         let store = EKEventStore()
@@ -198,6 +232,7 @@ class EventOrganizerTests: XCTestCase {
         XCTAssertEqual(results.notOrganizedTasks, [tasks.last!])
     }
     
+    // MARK: Organize complex
     func testOrganizeComplex() {
         
         let store = EKEventStore()
@@ -254,6 +289,7 @@ class EventOrganizerTests: XCTestCase {
         XCTAssertEqual(results.notOrganizedTasks, [])
     }
     
+    // MARK: Organize with pauses
     func testOrganizeWithPauses() {
         
         let store = EKEventStore()
@@ -308,6 +344,138 @@ class EventOrganizerTests: XCTestCase {
         e4.calendar = calendar
         e4.startDate = Calendar.current.date(from: end)! - 3600
         e4.endDate = e4.startDate + 3600
+        
+        let expected = [e1, e2, e3, e4]
+        
+        XCTAssertEqual(results.events, expected)
+    }
+    
+    // MARK: Different days in order
+    func testOrganizeDifferentDaysInOrder() {
+        let store = EKEventStore()
+        let calendar = EKCalendar(for: .event, eventStore: store)
+        
+        var dateComponents1 = DateComponents()
+        dateComponents1.year = 2020
+        dateComponents1.month = 8
+        dateComponents1.day = 23
+        
+        var dateComponents2 = DateComponents()
+        dateComponents2.year = 2020
+        dateComponents2.month = 8
+        dateComponents2.day = 25
+        
+        let day1 = Calendar.current.date(from: dateComponents1)!
+        let day2 = Calendar.current.date(from: dateComponents2)!
+        var begin = DateComponents(hour: 8)
+        var end = DateComponents(hour: 10)
+        let organizer = EventOrganizer(dateComponentsForLimits: [(begin, end)], pauseEvery: 7200, pauseLength: 3600)
+        
+        let tasks = [
+            Task(title: "Day 1.1", date: day1, time: 3600),
+            Task(title: "Day 1.2", date: day1, time: 3600),
+            Task(title: "Day 2.1", date: day2, time: 3600),
+            Task(title: "Day 2.2", date: day2, time: 3600)
+        ]
+        
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
+        
+        begin.year = 2020
+        begin.month = 8
+        begin.day = 23
+        end.year = 2020
+        end.month = 8
+        end.day = 25
+        
+        let e1 = EKEvent(eventStore: store)
+        e1.title = "Day 1.1"
+        e1.calendar = calendar
+        e1.startDate = Calendar.current.date(from: begin)!
+        e1.endDate = e1.startDate + 3600
+        
+        let e2 = EKEvent(eventStore: store)
+        e2.title = "Day 1.2"
+        e2.calendar = calendar
+        e2.startDate = Calendar.current.date(from: begin)! + 3600
+        e2.endDate = e2.startDate + 3600
+        
+        let e3 = EKEvent(eventStore: store)
+        e3.title = "Day 2.1"
+        e3.calendar = calendar
+        e3.startDate = Calendar.current.date(from: end)! - 7200
+        e3.endDate = e3.startDate + 3600
+        
+        let e4 = EKEvent(eventStore: store)
+        e4.title = "Day 2.2"
+        e4.calendar = calendar
+        e4.startDate = Calendar.current.date(from: end)! - 3600
+        e4.endDate = e4.startDate + 3600
+        
+        let expected = [e1, e2, e3, e4]
+        
+        XCTAssertEqual(results.events, expected)
+    }
+    
+    // MARK: Different days out of order
+    func testOrganizeDifferentDaysOutOfOrder() {
+        let store = EKEventStore()
+        let calendar = EKCalendar(for: .event, eventStore: store)
+        
+        var dateComponents1 = DateComponents()
+        dateComponents1.year = 2020
+        dateComponents1.month = 8
+        dateComponents1.day = 23
+        
+        var dateComponents2 = DateComponents()
+        dateComponents2.year = 2020
+        dateComponents2.month = 8
+        dateComponents2.day = 25
+        
+        let day1 = Calendar.current.date(from: dateComponents1)!
+        let day2 = Calendar.current.date(from: dateComponents2)!
+        var begin = DateComponents(hour: 8)
+        var end = DateComponents(hour: 10)
+        let organizer = EventOrganizer(dateComponentsForLimits: [(begin, end)], pauseEvery: 7200, pauseLength: 3600)
+        
+        let tasks = [
+            Task(title: "Day 1.2", date: day1, time: 1800),
+            Task(title: "Day 2.2", date: day2, time: 1800),
+            Task(title: "Day 1.1", date: day1, time: 3600),
+            Task(title: "Day 2.1", date: day2, time: 3600),
+        ]
+        
+        let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
+        
+        begin.year = 2020
+        begin.month = 8
+        begin.day = 23
+        end.year = 2020
+        end.month = 8
+        end.day = 25
+        
+        let e1 = EKEvent(eventStore: store)
+        e1.title = "Day 1.1"
+        e1.calendar = calendar
+        e1.startDate = Calendar.current.date(from: begin)!
+        e1.endDate = e1.startDate + 3600
+        
+        let e2 = EKEvent(eventStore: store)
+        e2.title = "Day 1.2"
+        e2.calendar = calendar
+        e2.startDate = Calendar.current.date(from: begin)! + 3600
+        e2.endDate = e2.startDate + 1800
+        
+        let e3 = EKEvent(eventStore: store)
+        e3.title = "Day 2.1"
+        e3.calendar = calendar
+        e3.startDate = Calendar.current.date(from: end)! - 7200
+        e3.endDate = e3.startDate + 3600
+        
+        let e4 = EKEvent(eventStore: store)
+        e4.title = "Day 2.2"
+        e4.calendar = calendar
+        e4.startDate = Calendar.current.date(from: end)! - 3600
+        e4.endDate = e4.startDate + 1800
         
         let expected = [e1, e2, e3, e4]
         
