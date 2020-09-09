@@ -67,7 +67,7 @@ func createCalendar(with store: EKEventStore) -> EKCalendar {
 func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents) {
     func organize(with calendar: EKCalendar) {
         let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)])
-        let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * Float(1/3)))})
+        let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * (Float(1) / Float(3))))})
         delegate.finishedOrganizing(events: events, notOrganizedTasks: notOrganizedTasks, notParsableLines: notParsable)
     }
     var tasks = [Task]()
@@ -76,7 +76,7 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
         if let strings = UIPasteboard.general.strings {
             let parser = MarkdownParser()
             for string in strings {
-                let (t, notParsableLines) = parser.parseTasks(from: string, progressCallback: {delegate.updateProgress($0 * Float(1 / 3))})
+                let (t, notParsableLines) = parser.parseTasks(from: string, progressCallback: {delegate.updateProgress($0 * Float(1) / Float(3))})
                 tasks.append(contentsOf: t)
                 notParsable.append(contentsOf: notParsableLines)
             }
@@ -108,7 +108,7 @@ func exportToCalendar(events: [EKEvent], delegate: ExportToCalendarDelegate, sho
         do {
             try delegate.store.save(event, span: EKSpan.thisEvent, commit: true)
             idx += 1
-            delegate.updateProgress(0.66666 + (Float(idx) / Float(events.count)))
+            delegate.updateProgress(0.66666 + ((Float(idx) / Float(events.count) / Float(3))))
         } catch {
             print(error)
             unexportedItems.append(event)

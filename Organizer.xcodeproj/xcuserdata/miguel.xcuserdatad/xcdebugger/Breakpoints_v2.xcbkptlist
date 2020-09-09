@@ -39,16 +39,96 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "487C8621-38C1-479C-B3A4-9E06C608D253"
-            shouldBeEnabled = "No"
+            uuid = "9C82D7AA-6FF3-4433-9E7E-CC7DFFFB54BD"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Shared/EventOrganizer.swift"
+            filePath = "UI/MainScreen.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "87"
-            endingLineNumber = "87"
-            landmarkName = "organize(tasks:with:for:progressCallback:)"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
+            landmarkName = "parseFromPasteboardAndOrganize()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "9C82D7AA-6FF3-4433-9E7E-CC7DFFFB54BD - e9ad9d5de3dcb917"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Organizer.MainScreen.parseFromPasteboardAndOrganize() -&gt; ()"
+                  moduleName = "Organizer"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/miguel/repos/Apple-Projects/Organizer/UI/MainScreen.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "79"
+                  endingLineNumber = "79"
+                  offsetFromSymbolStart = "3508">
+               </Location>
+               <Location
+                  uuid = "9C82D7AA-6FF3-4433-9E7E-CC7DFFFB54BD - abf2f1a7e958af1b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in Organizer.MainScreen.parseFromPasteboardAndOrganize() -&gt; ()"
+                  moduleName = "Organizer"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/miguel/repos/Apple-Projects/Organizer/UI/MainScreen.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "79"
+                  endingLineNumber = "79"
+                  offsetFromSymbolStart = "44">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "177B2DC5-22C7-41A9-B76C-FA0E9CC94E58"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UI/MainScreen.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
+            landmarkName = "parseFromPasteboardAndOrganize()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BFCA0279-590B-4241-B6D0-2E889FE604CD"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UI/MainScreen.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
+            landmarkName = "parseFromPasteboardAndOrganize()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "57F91377-86FF-4A1B-970D-3E6EDD1AF2D5"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UI/MainScreen.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
+            landmarkName = "parseFromPasteboardAndOrganize()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

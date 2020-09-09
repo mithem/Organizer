@@ -11,7 +11,9 @@ import EventKit
 struct MainScreen: View {
     @State private var showingDidNotFindValidMarkdownActionSheet = false
     @State private var buttonsDisabled = false
+    
     @State private var showingExportSuccessfulActionSheet = false
+    @State private var showingInvalidBeginAndEndActionSheet = false
     
     @State private var beginning = Date(timeIntervalSinceNow: 0)
     @State private var end = Date(timeIntervalSinceNow: 15 * 60)
@@ -35,10 +37,16 @@ struct MainScreen: View {
         NavigationView {
             Form {
                 DatePicker("Beginning", selection: $beginning, displayedComponents: [.hourAndMinute])
+                    .actionSheet(isPresented: $showingDidNotFindValidMarkdownActionSheet) {
+                        ActionSheet(title: Text("No data found"), message: Text("Unable to find valid markdown from Things."), buttons: [.default(Text("OK"))])
+                    }
                 DatePicker("End", selection: $end, displayedComponents: [.hourAndMinute])
+                    .actionSheet(isPresented: $showingInvalidBeginAndEndActionSheet) {
+                        ActionSheet(title: Text("Invalid beginning & end"), message: Text("Please make sure that the end date is later than beginning."), buttons: [.default(Text("OK"))])
+                    }
                 VStack {
                     ProgressView(value: progressValue)
-                        .animation(.easeInOut)
+                    //.animation(.easeInOut)
                     HStack {
                         Spacer()
                         Text(progressDescription)
@@ -55,18 +63,23 @@ struct MainScreen: View {
             }
             .navigationBarItems(trailing: NavigationLink("Settings", destination: SettingsView()))
             .navigationTitle("Organizer")
-            .actionSheet(isPresented: $showingDidNotFindValidMarkdownActionSheet) {
-                ActionSheet(title: Text("No data found"), message: Text("Unable to find valid markdown from Things."), buttons: [.default(Text("OK"))])
-            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
     
     func parseFromPasteboardAndOrganize() {
         progressDescription = "Parsing tasks"
+        progressValue = 0
         let beginComponents = Calendar.current.dateComponents([.hour, .minute], from: beginning)
         let endComponents = Calendar.current.dateComponents([.hour, .minute], from: end)
-        copyFromPasteboardAndOrganizeTasks(delegate: self, beginComponents: beginComponents, endComponents: endComponents)
+        
+        if beginning >= end {
+            showingInvalidBeginAndEndActionSheet = true
+        } else {
+            DispatchQueue.global().sync { // So progress bar can update on main thread
+                copyFromPasteboardAndOrganizeTasks(delegate: self, beginComponents: beginComponents, endComponents: endComponents)
+            }
+        }
     }
 }
 
@@ -83,8 +96,10 @@ extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
     
     func finishedOrganizing(events: [EKEvent], notOrganizedTasks: [Task], notParsableLines: [String]) {
         progressValue = 0.66666
-        unsuccessfulDataManager.notOrganizedTasks = notOrganizedTasks
-        unsuccessfulDataManager.notParsableLines = notParsableLines
+        DispatchQueue.main.async {
+            unsuccessfulDataManager.notOrganizedTasks = notOrganizedTasks
+            unsuccessfulDataManager.notParsableLines = notParsableLines
+        }
         self.events = events
         
         exportToCalendar(events: self.events, delegate: self, showCalendar: (notOrganizedTasks.isEmpty && notParsableLines.isEmpty) ? nil : false)
@@ -102,7 +117,9 @@ extension MainScreen: ExportToCalendarDelegate {
     
     func exportComplete(unexportedItems: [EKEvent], showActionSheet: Bool) {
         progressValue = 1
-        unsuccessfulDataManager.notScheduledEvents = unexportedItems
+        DispatchQueue.main.async {
+            unsuccessfulDataManager.notScheduledEvents = unexportedItems
+        }
         if showActionSheet && unexportedItems.count < events.count {
             showingExportSuccessfulActionSheet = true
         }

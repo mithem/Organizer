@@ -48,10 +48,8 @@ struct MarkdownParser {
             let task = Task(title: newTitle, date: taskDate, time: newTime)
             tasks.append(task)
             lineIdx += 1
-            progressCallback(Float(lineIdx / lines.count))
+            progressCallback(Float(lineIdx) / Float(lines.count))
         }
-        
-        progressCallback(Float(1) / Float(3))
         return (tasks: tasks, notParsableLines: notParsableLines)
     }
     
