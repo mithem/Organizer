@@ -50,6 +50,7 @@ struct MarkdownParser {
             lineIdx += 1
             progressCallback(Float(lineIdx) / Float(lines.count))
         }
+        progressCallback(0.333333333)
         return (tasks: tasks, notParsableLines: notParsableLines)
     }
     

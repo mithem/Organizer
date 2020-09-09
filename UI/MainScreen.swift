@@ -46,7 +46,7 @@ struct MainScreen: View {
                     }
                 VStack {
                     ProgressView(value: progressValue)
-                    //.animation(.easeInOut)
+                        .animation(.easeInOut)
                     HStack {
                         Spacer()
                         Text(progressDescription)
