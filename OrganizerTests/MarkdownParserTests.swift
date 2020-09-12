@@ -138,24 +138,25 @@ class MarkdownParserTests: XCTestCase {
         }
     }
     
-    func testParseTasks() {
+    func testParseTasksUpcoming() {
         let input = """
 - [ ] hello
 - 22.08.2020 [+] 1h clean the room (22.08.2020)
 - 22.08.2020 [x] 0h30min another test!
 - 22.08.2020 [] 5m Yet& another🚀 .task%
 - [] 1h hello
+- [ ] 2h And another! (25.08.2020)
 """
         let day = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 22, hour: 12, minute: 0, nanosecond: 0))!
         let currentDay = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Date()))!
         
-        let expected = [Task(title: "clean the room", date: day, time: 3600), Task(title: "another test!", date: day, time: 1800), Task(title: "Yet& another .task%", date: day, time: 300), Task(title: "hello", date: currentDay, time: 3600)]
+        let expected = [Task(title: "clean the room", date: day, time: 3600), Task(title: "another test!", date: day, time: 1800), Task(title: "Yet& another .task%", date: day, time: 300), Task(title: "hello", date: currentDay, time: 3600), Task(title: "And another!", date: currentDay, time: 7200)]
         
         var lastProgress = Float(0)
         let results = parser.parseTasks(from: input, progressCallback: {
             lastProgress = $0
-        }).tasks
-        XCTAssertEqual(results, expected)
+        })
+        XCTAssertEqual(results.tasks, expected)
         XCTAssert(lastProgress > 0.333 && lastProgress < 0.334)
     }
 }

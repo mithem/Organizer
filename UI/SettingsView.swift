@@ -13,17 +13,32 @@ struct SettingsView: View {
     @AppStorage(UserDefaultsKeys.pauseEveryTimeInterval) var pauseEvery = PauseEveryTimeInterval.h3.rawValue
     @AppStorage(UserDefaultsKeys.pauseLengthTimeInterval) var pauseLength = PauseLengthTimeInterval.min45.rawValue
     
+    @State private var showingOnboardingView = false
+    
     var body: some View {
         Form {
-            Toggle("Show calendar app after export", isOn: $showCalendarAppAFterExport)
-            Picker("Pause every", selection: $pauseEvery) {
-                ForEach(PauseEveryTimeInterval.allCases) { value in
-                    Text(value.rawValue).tag(value.rawValue)
+            Section {
+                Toggle("Show calendar app after export", isOn: $showCalendarAppAFterExport)
+                Picker("Pause every", selection: $pauseEvery) {
+                    ForEach(PauseEveryTimeInterval.allCases) { value in
+                        Text(value.rawValue).tag(value.rawValue)
+                    }
+                }
+                Picker("Pause length", selection: $pauseLength) {
+                    ForEach(PauseLengthTimeInterval.allCases) { value in
+                        Text(value.rawValue).tag(value)
+                    }
                 }
             }
-            Picker("Pause length", selection: $pauseLength) {
-                ForEach(PauseLengthTimeInterval.allCases) { value in
-                    Text(value.rawValue).tag(value)
+            Section {
+                Button("How to use") {
+                    showingOnboardingView = true
+                }
+                Button("Show next time") {
+                    UserDefaults().set(false, forKey: UserDefaultsKeys.didShowOnboardingView)
+                }
+                .sheet(isPresented: $showingOnboardingView) {
+                    OnboardingView()
                 }
             }
         }

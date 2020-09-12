@@ -31,4 +31,5 @@ struct UserDefaultsKeys {
     static let showCalendarAppAfterExport = "showCalendarAppAfterExport"
     static let pauseEveryTimeInterval = "pauseEveryTimeInterval"
     static let pauseLengthTimeInterval = "pauseLengthTimeInterval"
+    static let didShowOnboardingView = "didShowOnboardingView"
 }

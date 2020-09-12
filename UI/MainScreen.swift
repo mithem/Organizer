@@ -26,6 +26,7 @@ struct MainScreen: View {
     @ObservedObject var unsuccessfulDataManager = UnsuccessfulDataManager()
     
     @State private var showingUnsuccessfulDataView = false
+    @State private var showingOnboardingView = false
     
     let store = EKEventStore()
     
@@ -54,8 +55,14 @@ struct MainScreen: View {
                         Spacer()
                     }
                 }
+                .sheet(isPresented: $showingOnboardingView) {
+                    OnboardingView()
+                }
                 Button("Parse from clipboard/pasteboard") {
                     parseFromPasteboardAndOrganize()
+                }
+                .onAppear {
+                    showingOnboardingView = !UserDefaults().bool(forKey: UserDefaultsKeys.didShowOnboardingView)
                 }
                 .sheet(isPresented: $showingUnsuccessfulDataView) {
                     UnsuccessfulDataView(manager: unsuccessfulDataManager)
