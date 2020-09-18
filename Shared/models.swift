@@ -24,16 +24,23 @@ extension Task {
 
 extension Task: Equatable {
     static func == (lhs: Task, rhs: Task) -> Bool {
-        let t1 = lhs.title == rhs.title
-        let d = lhs.date == rhs.date
-        let t2 = lhs.time == rhs.time
-        return t1 && d && t2
+        let title = lhs.title == rhs.title
+        let date = lhs.date == rhs.date
+        let time = lhs.time == rhs.time
+        return title && date && time
     }
 }
 
 extension Task: Comparable {
     static func < (lhs: Task, rhs: Task) -> Bool {
-        return lhs.time > rhs.time
+        
+        if lhs.date < rhs.date { return true }
+        else if lhs.date > rhs.date { return false }
+        else if lhs.time > rhs.time { return true } // bigger times first
+        else if lhs.time < rhs.time { return false }
+        else if lhs.title < rhs.title { return true }
+        
+        return false
     }
 }
 

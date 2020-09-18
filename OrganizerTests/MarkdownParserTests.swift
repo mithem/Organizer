@@ -147,10 +147,10 @@ class MarkdownParserTests: XCTestCase {
 - [] 1h hello
 - [ ] 2h And another! (25.08.2020)
 """
-        let day = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 22, hour: 12, minute: 0, nanosecond: 0))!
+        let day = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 22, hour: 12))!
         let currentDay = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Date()))!
         
-        let expected = [Task(title: "clean the room", date: day, time: 3600), Task(title: "another test!", date: day, time: 1800), Task(title: "Yet& another .task%", date: day, time: 300), Task(title: "hello", date: currentDay, time: 3600), Task(title: "And another!", date: currentDay, time: 7200)]
+        let expected = [Task(title: "clean the room", date: day, time: 3600), Task(title: "another test!", date: day, time: 1800), Task(title: "Yet& another .task%", date: day, time: 300), Task(title: "And another!", date: currentDay, time: 7200), Task(title: "hello", date: currentDay, time: 3600)]
         
         var lastProgress = Float(0)
         let results = parser.parseTasks(from: input, progressCallback: {
@@ -158,5 +158,26 @@ class MarkdownParserTests: XCTestCase {
         })
         XCTAssertEqual(results.tasks, expected)
         XCTAssert(lastProgress > 0.333 && lastProgress < 0.334)
+    }
+    
+    func testParseTasksSorting() {
+        func task(_ title: String) -> Task { Task(title: title, date: day, time: 30 * 60) }
+        let input = """
+- 23.08.2020 [] 30m AB
+- 23.08.2020 [] 30m AA
+- 23.08.2020 [] 30m AC
+- 23.08.2020 [] 30m BC
+- 23.08.2020 [] 30m BA
+- 23.08.2020 [] 30m BB
+"""
+        
+        let day = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 23, hour: 12))!
+        
+        let expected = [task("AA"), task("AB"), task("AC"), task("BA"), task("BB"), task("BC")]
+        
+        let results = parser.parseTasks(from: input) {_ in }
+        
+        XCTAssertEqual(results.tasks, expected)
+        
     }
 }

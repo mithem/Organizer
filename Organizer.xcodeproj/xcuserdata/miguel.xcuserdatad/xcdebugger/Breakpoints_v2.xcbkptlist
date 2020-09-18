@@ -52,7 +52,7 @@
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "9C82D7AA-6FF3-4433-9E7E-CC7DFFFB54BD - e9ad9d5de3dcb917"
+                  uuid = "9C82D7AA-6FF3-4433-9E7E-CC7DFFFB54BD - e9ad9d5de3dcb82e"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -62,12 +62,12 @@
                   urlString = "file:///Users/miguel/repos/Apple-Projects/Organizer/UI/MainScreen.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "79"
-                  endingLineNumber = "79"
+                  startingLineNumber = "86"
+                  endingLineNumber = "86"
                   offsetFromSymbolStart = "2917">
                </Location>
                <Location
-                  uuid = "9C82D7AA-6FF3-4433-9E7E-CC7DFFFB54BD - abf2f1a7e958af1b"
+                  uuid = "9C82D7AA-6FF3-4433-9E7E-CC7DFFFB54BD - abf2f1a7e958ae22"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -77,8 +77,8 @@
                   urlString = "file:///Users/miguel/repos/Apple-Projects/Organizer/UI/MainScreen.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "79"
-                  endingLineNumber = "79"
+                  startingLineNumber = "86"
+                  endingLineNumber = "86"
                   offsetFromSymbolStart = "44">
                </Location>
             </Locations>
@@ -129,6 +129,54 @@
             startingLineNumber = "78"
             endingLineNumber = "78"
             landmarkName = "parseFromPasteboardAndOrganize()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "05C189B2-1234-4A2A-89F1-D65821952F33"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "OrganizerTests/OrganizerTests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
+            landmarkName = "testTaskCompatable()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "154CB60E-0823-4EF6-8361-E386411CA755"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Shared/models.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "&lt;(_:_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "79506C93-F34B-4BF7-9B96-9F554941A8D3"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "OrganizerTests/OrganizerTests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "54"
+            endingLineNumber = "54"
+            landmarkName = "testTaskComparable3()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

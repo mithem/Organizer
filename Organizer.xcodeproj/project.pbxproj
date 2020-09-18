@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		490DCEBF24F9393B00AE15CC /* shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4046B24F115A70076F7C4 /* shared.swift */; };
 		490DCEC124F93DD600AE15CC /* EventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490DCEC024F93DD600AE15CC /* EventView.swift */; };
+		496281A8251507CA00BA83E1 /* OrganizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496281A7251507CA00BA83E1 /* OrganizerTests.swift */; };
 		4970B62D24F2434A00A2744E /* EventOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4970B62C24F2434A00A2744E /* EventOrganizer.swift */; };
 		4970B62F24F24C3B00A2744E /* EventOrganizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4970B62E24F24C3B00A2744E /* EventOrganizerTests.swift */; };
 		497E95EE24F2B94A00E9097A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497E95ED24F2B94A00E9097A /* SettingsView.swift */; };
@@ -52,6 +53,7 @@
 
 /* Begin PBXFileReference section */
 		490DCEC024F93DD600AE15CC /* EventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventView.swift; sourceTree = "<group>"; };
+		496281A7251507CA00BA83E1 /* OrganizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerTests.swift; sourceTree = "<group>"; };
 		4970B62C24F2434A00A2744E /* EventOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventOrganizer.swift; sourceTree = "<group>"; };
 		4970B62E24F24C3B00A2744E /* EventOrganizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventOrganizerTests.swift; sourceTree = "<group>"; };
 		497E95ED24F2B94A00E9097A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 				49A4047924F11C9A0076F7C4 /* Info.plist */,
 				49A4048424F120470076F7C4 /* MarkdownParserTests.swift */,
 				4970B62E24F24C3B00A2744E /* EventOrganizerTests.swift */,
+				496281A7251507CA00BA83E1 /* OrganizerTests.swift */,
 			);
 			path = OrganizerTests;
 			sourceTree = "<group>";
@@ -294,6 +297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				49A4048524F120470076F7C4 /* MarkdownParserTests.swift in Sources */,
+				496281A8251507CA00BA83E1 /* OrganizerTests.swift in Sources */,
 				4970B62F24F24C3B00A2744E /* EventOrganizerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
