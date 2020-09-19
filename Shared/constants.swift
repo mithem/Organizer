@@ -32,4 +32,5 @@ struct UserDefaultsKeys {
     static let pauseEveryTimeInterval = "pauseEveryTimeInterval"
     static let pauseLengthTimeInterval = "pauseLengthTimeInterval"
     static let didShowOnboardingView = "didShowOnboardingView"
+    static let eventAlarmOffset = "eventAlarmOffset"
 }

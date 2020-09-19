@@ -12,6 +12,7 @@ struct SettingsView: View {
     @AppStorage(UserDefaultsKeys.showCalendarAppAfterExport) var showCalendarAppAFterExport = false
     @AppStorage(UserDefaultsKeys.pauseEveryTimeInterval) var pauseEvery = PauseEveryTimeInterval.h3.rawValue
     @AppStorage(UserDefaultsKeys.pauseLengthTimeInterval) var pauseLength = PauseLengthTimeInterval.min45.rawValue
+    @AppStorage(UserDefaultsKeys.eventAlarmOffset) var eventAlarmOffset = EventAlarmOffset.none.rawValue
     
     @State private var showingOnboardingView = false
     
@@ -27,6 +28,16 @@ struct SettingsView: View {
                 Picker("Pause length", selection: $pauseLength) {
                     ForEach(PauseLengthTimeInterval.allCases) { value in
                         Text(value.rawValue).tag(value)
+                    }
+                }
+                Toggle("Enable alarm", isOn: Binding(get: {eventAlarmOffset != EventAlarmOffset.none.rawValue}, set: {eventAlarmOffset = $0 ? EventAlarmOffset.min15.rawValue : EventAlarmOffset.none.rawValue}))
+                if eventAlarmOffset != EventAlarmOffset.none.rawValue {
+                    Picker("Remind before", selection: $eventAlarmOffset) {
+                        ForEach(EventAlarmOffset.allCases) { value in
+                            if value != .none {
+                                Text(value.rawValue).tag(value.rawValue)
+                            }
+                        }
                     }
                 }
             }

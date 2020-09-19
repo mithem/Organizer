@@ -28,6 +28,8 @@ struct MainScreen: View {
     @State private var showingUnsuccessfulDataView = false
     @State private var showingOnboardingView = false
     
+    @AppStorage(UserDefaultsKeys.eventAlarmOffset) var alarmRelativeOffsetString = EventAlarmOffset.none.rawValue
+    
     let store = EKEventStore()
     
     init() {
@@ -91,6 +93,10 @@ struct MainScreen: View {
 }
 
 extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
+    var alarmRelativeOffset: TimeInterval? {
+        (EventAlarmOffset(rawValue: alarmRelativeOffsetString) ?? .none).timeInterval
+    }
+    
     func updateProgress(_ progress: Float) {
         progressValue = progress
     }

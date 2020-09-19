@@ -68,6 +68,12 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
     func organize(with calendar: EKCalendar) {
         let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)])
         let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * (Float(1) / Float(3))))})
+        if let offset = delegate.alarmRelativeOffset {
+            for i in 0..<events.count {
+                let alarm = EKAlarm(relativeOffset: offset)
+                events[i].addAlarm(alarm)
+            }
+        }
         delegate.finishedOrganizing(events: events, notOrganizedTasks: notOrganizedTasks, notParsableLines: notParsable)
     }
     var tasks = [Task]()
@@ -93,6 +99,7 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
 
 protocol CopyFromPasteboardAndOrganizeTasksDelegate {
     var store: EKEventStore { get }
+    var alarmRelativeOffset: TimeInterval? { get }
     
     func beginOrganizing()
     func finishedOrganizing(events: [EKEvent], notOrganizedTasks: [Task], notParsableLines: [String])

@@ -44,6 +44,9 @@ extension Task: Comparable {
     }
 }
 
+//MARK: The ugliest enums in the world
+// seriously, how can I do this beeettter??
+// problem seems to be with the SwiftUI Picker?
 enum PauseEveryTimeInterval: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
     
@@ -132,6 +135,49 @@ enum PauseLengthTimeInterval: String, CaseIterable, Identifiable {
             return 14400 + 30 * 60
         case .h5:
             return 18000
+        }
+    }
+}
+
+enum EventAlarmOffset: String, CaseIterable, Identifiable {
+    var id: String { self.rawValue }
+    
+    case none = "None"
+    case zero = "At begin"
+    case min1 = "1 min"
+    case min2 = "2 min"
+    case min3 = "3 min"
+    case min5 = "5 min"
+    case min10 = "10 min"
+    case min15 = "15 min"
+    case min20 = "20 min"
+    case min25 = "25 min"
+    case min30 = "30 min"
+    
+    var timeInterval: TimeInterval? {
+        switch(self) {
+        case .none:
+            return nil
+        case .zero:
+            return 0
+        case .min1:
+            return -60
+        case .min2:
+            return -120
+        case .min3:
+            return -180
+        case .min5:
+            return -300
+        case .min10:
+            return -600
+        case .min15:
+            return -900
+        case .min20:
+            return -1200
+        case .min25:
+            return -1500
+        case .min30:
+            return -1800
         }
     }
 }
