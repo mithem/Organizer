@@ -12,6 +12,8 @@
 		496281A8251507CA00BA83E1 /* OrganizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 496281A7251507CA00BA83E1 /* OrganizerTests.swift */; };
 		4970B62D24F2434A00A2744E /* EventOrganizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4970B62C24F2434A00A2744E /* EventOrganizer.swift */; };
 		4970B62F24F24C3B00A2744E /* EventOrganizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4970B62E24F24C3B00A2744E /* EventOrganizerTests.swift */; };
+		497E7A3F251796F300FB218E /* Intents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 497E7A3E251796F300FB218E /* Intents.intentdefinition */; };
+		497E7A4125179C8700FB218E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497E7A4025179C8700FB218E /* AppDelegate.swift */; };
 		497E95EE24F2B94A00E9097A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497E95ED24F2B94A00E9097A /* SettingsView.swift */; };
 		499AD57424FB6060006506F2 /* constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499AD57324FB6060006506F2 /* constants.swift */; };
 		49A4045A24F1155D0076F7C4 /* OrganizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4044724F115560076F7C4 /* OrganizerApp.swift */; };
@@ -56,6 +58,8 @@
 		496281A7251507CA00BA83E1 /* OrganizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerTests.swift; sourceTree = "<group>"; };
 		4970B62C24F2434A00A2744E /* EventOrganizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventOrganizer.swift; sourceTree = "<group>"; };
 		4970B62E24F24C3B00A2744E /* EventOrganizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventOrganizerTests.swift; sourceTree = "<group>"; };
+		497E7A3E251796F300FB218E /* Intents.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = Intents.intentdefinition; sourceTree = "<group>"; };
+		497E7A4025179C8700FB218E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		497E95ED24F2B94A00E9097A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		498477632507FA4400FBF38B /* Organizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Organizer.entitlements; sourceTree = "<group>"; };
 		499AD57324FB6060006506F2 /* constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = constants.swift; sourceTree = "<group>"; };
@@ -118,6 +122,7 @@
 				499AD57324FB6060006506F2 /* constants.swift */,
 				49A4046E24F115C50076F7C4 /* Extensions.swift */,
 				49A4048624F148770076F7C4 /* models.swift */,
+				497E7A3E251796F300FB218E /* Intents.intentdefinition */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -153,6 +158,7 @@
 		49A4048924F17DC50076F7C4 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				497E7A4025179C8700FB218E /* AppDelegate.swift */,
 				49A4044724F115560076F7C4 /* OrganizerApp.swift */,
 				49A4044824F115560076F7C4 /* ContentView.swift */,
 				49A4048A24F17E2A0076F7C4 /* MainScreen.swift */,
@@ -279,6 +285,7 @@
 				4970B62D24F2434A00A2744E /* EventOrganizer.swift in Sources */,
 				49C1FA2C250C9C60005E3BFA /* OnboardingView.swift in Sources */,
 				49A4048B24F17E2A0076F7C4 /* MainScreen.swift in Sources */,
+				497E7A3F251796F300FB218E /* Intents.intentdefinition in Sources */,
 				490DCEC124F93DD600AE15CC /* EventView.swift in Sources */,
 				497E95EE24F2B94A00E9097A /* SettingsView.swift in Sources */,
 				49A4048724F148770076F7C4 /* models.swift in Sources */,
@@ -288,6 +295,7 @@
 				49A4045C24F1155D0076F7C4 /* ContentView.swift in Sources */,
 				49A4045A24F1155D0076F7C4 /* OrganizerApp.swift in Sources */,
 				49A4046924F1157D0076F7C4 /* MarkdownParser.swift in Sources */,
+				497E7A4125179C8700FB218E /* AppDelegate.swift in Sources */,
 				49C829F725049D3D00CA30EA /* UnsuccessfulDataView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -24,6 +24,10 @@
 	<true/>
 	<key>NSCalendarsUsageDescription</key>
 	<string>We would like to export ToDos to your calendar.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>ParseTasksIntent</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -42,6 +46,7 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

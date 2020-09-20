@@ -8,6 +8,7 @@
 import Foundation
 import EventKit
 import UIKit
+import Intents
 
 func checkAuthStatus(with store: EKEventStore) {
     let status = EKEventStore.authorizationStatus(for: .event)
@@ -46,6 +47,23 @@ func checkForCalendar(with store: EKEventStore) -> EKCalendar {
         return createCalendar(with: store)
     }
 }
+
+//func checkSiriKitAuthorization(callback: @escaping (Bool) -> Void) {
+//    INPreferences.requestSiriAuthorization { status in
+//        switch(status){
+//        case .notDetermined:
+//            callback(false)
+//        case .restricted:
+//            callback(false)
+//        case .denied:
+//            callback(false)
+//        case .authorized:
+//            callback(true)
+//        @unknown default:
+//            callback(false)
+//        }
+//    }
+//}
 
 func createCalendar(with store: EKEventStore) -> EKCalendar {
     let calendar = EKCalendar(for: .event, eventStore: store)

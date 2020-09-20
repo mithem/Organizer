@@ -77,6 +77,9 @@ struct MainScreen: View {
     }
     
     func parseFromPasteboardAndOrganize() {
+//        checkSiriKitAuthorization {
+//            print($0)
+//        }
         progressDescription = "Parsing tasks"
         progressValue = 0
         let beginComponents = Calendar.current.dateComponents([.hour, .minute], from: beginning)
