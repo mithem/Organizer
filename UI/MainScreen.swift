@@ -44,10 +44,15 @@ struct MainScreen: View {
                     .actionSheet(isPresented: $showingDidNotFindValidMarkdownActionSheet) {
                         ActionSheet(title: Text("No data found"), message: Text("Unable to find valid markdown from Things."), buttons: [.default(Text("OK"))])
                     }
+                    .accessibility(label: Text("Start time"))
+                    .accessibilityAction(named: Text("Set start time to now"), {beginning = Date(timeIntervalSinceNow: 0)})
                 DatePicker("End", selection: $end, displayedComponents: [.hourAndMinute])
                     .actionSheet(isPresented: $showingInvalidBeginAndEndActionSheet) {
                         ActionSheet(title: Text("Invalid beginning & end"), message: Text("Please make sure that the end date is later than beginning."), buttons: [.default(Text("OK"))])
                     }
+                    .accessibility(label: Text("End time"))
+                    .accessibilityAction(named: Text("Set end time to in 15 minutes"), {end = Date(timeIntervalSinceNow: 15 * 60)})
+                    .accessibilityAction(named: Text("Set end time to in 1 hour"), {end = Date(timeIntervalSinceNow: 3600)})
                 VStack {
                     ProgressView(value: progressValue)
                         .animation(.easeInOut)
@@ -56,6 +61,8 @@ struct MainScreen: View {
                         Spacer()
                         Text(progressDescription)
                             .foregroundColor(.secondary)
+                            .accessibility(label: Text("Progress description"))
+                            .accessibility(value: Text(progressDescription))
                         Spacer()
                     }
                 }
@@ -65,6 +72,7 @@ struct MainScreen: View {
                 Button("Parse from clipboard/pasteboard") {
                     parseFromPasteboardAndOrganize()
                 }
+                .accessibility(hint: Text("Parse tasks from clipboard, organize them, and export to your calendar"))
                 .onAppear {
                     showingOnboardingView = !UserDefaults().bool(forKey: UserDefaultsKeys.didShowOnboardingView)
                 }
@@ -122,6 +130,7 @@ extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
     
     func didNotFindValidMarkdown() {
         showingDidNotFindValidMarkdownActionSheet = true
+        progressDescription = "Parse first."
     }
 }
 

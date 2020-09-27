@@ -22,14 +22,17 @@ struct SettingsView: View {
                 Toggle("Show calendar app after export", isOn: $showCalendarAppAFterExport)
                 Picker("Pause every", selection: $pauseEvery) {
                     ForEach(PauseEveryTimeInterval.allCases) { value in
-                        Text(value.rawValue).tag(value.rawValue)
+                        Text(value.rawValue)
+                            .tag(value.rawValue)
                     }
                 }
+                .accessibility(label: Text("Pause every"))
                 Picker("Pause length", selection: $pauseLength) {
                     ForEach(PauseLengthTimeInterval.allCases) { value in
                         Text(value.rawValue).tag(value)
                     }
                 }
+                .accessibility(label: Text("Pause length"))
                 Toggle("Enable alarm", isOn: Binding(get: {eventAlarmOffset != EventAlarmOffset.none.rawValue}, set: {eventAlarmOffset = $0 ? EventAlarmOffset.min15.rawValue : EventAlarmOffset.none.rawValue}))
                 if eventAlarmOffset != EventAlarmOffset.none.rawValue {
                     Picker("Remind before", selection: $eventAlarmOffset) {
@@ -45,9 +48,11 @@ struct SettingsView: View {
                 Button("How to use") {
                     showingOnboardingView = true
                 }
+                .accessibility(hint: Text("Show how to use screen"))
                 Button("Show next time") {
                     UserDefaults().set(false, forKey: UserDefaultsKeys.didShowOnboardingView)
                 }
+                .accessibility(hint: Text("Show hoe to use screen next time opening the app"))
                 .sheet(isPresented: $showingOnboardingView) {
                     OnboardingView()
                 }
