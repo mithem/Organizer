@@ -55,4 +55,18 @@ class OrganizerTests: XCTestCase {
         
         XCTAssertEqual(result, expected)
     }
+    
+    func testGetTapticNotificationType() {
+        XCTAssertEqual(getTapticNotificationType(eventsCount: 5, notScheduledEventsCount: 0, notOrganizedTasksCount: 0, notParsableLinesCount: 0), .success)
+        
+        XCTAssertEqual(getTapticNotificationType(eventsCount: 0, notScheduledEventsCount: 0, notOrganizedTasksCount: 0, notParsableLinesCount: 0), .warning)
+        
+        XCTAssertEqual(getTapticNotificationType(eventsCount: 3, notScheduledEventsCount: 2, notOrganizedTasksCount: 0, notParsableLinesCount: 0), .warning)
+        
+        XCTAssertEqual(getTapticNotificationType(eventsCount: 0, notScheduledEventsCount: 0, notOrganizedTasksCount: 5, notParsableLinesCount: 0), .error)
+        
+        XCTAssertEqual(getTapticNotificationType(eventsCount: 0, notScheduledEventsCount: 0, notOrganizedTasksCount: 0, notParsableLinesCount: 5), .error)
+        
+        XCTAssertEqual(getTapticNotificationType(eventsCount: 0, notScheduledEventsCount: 5, notOrganizedTasksCount: 0, notParsableLinesCount: 0), .error)
+    }
 }

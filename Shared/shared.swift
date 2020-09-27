@@ -156,3 +156,45 @@ protocol ExportToCalendarDelegate {
     func exportComplete(unexportedItems: [EKEvent], showActionSheet: Bool)
     func updateProgress(_ progress: Float)
 }
+
+func getTapticNotificationType(eventsCount: Int, notScheduledEventsCount: Int, notOrganizedTasksCount: Int, notParsableLinesCount: Int) -> UINotificationFeedbackGenerator.FeedbackType {
+    var warning = false
+    var error = false
+    
+    // logic is hard🤔
+    
+    if eventsCount == 0 && notScheduledEventsCount == 0 && notOrganizedTasksCount == 0 && notParsableLinesCount == 0 {
+        return .warning
+    }
+    
+    if notScheduledEventsCount != 0 && notScheduledEventsCount != notOrganizedTasksCount {
+        warning = true
+    } else if notOrganizedTasksCount != 0 && notOrganizedTasksCount != notParsableLinesCount {
+        warning = true
+    } else if notParsableLinesCount != 0 {
+        warning = true
+    }
+    
+    if notParsableLinesCount != 0 && notOrganizedTasksCount == 0 {
+        if notScheduledEventsCount == 0 {
+            error = true
+        } else {
+            warning = true
+        }
+    } else if notOrganizedTasksCount != 0 && notScheduledEventsCount == 0 {
+        error = true
+    } else if notScheduledEventsCount != 0 {
+        if eventsCount == 0 {
+            error = true
+        } else {
+            warning = true
+        }
+    }
+    
+    if error {
+        return .error
+    } else if warning {
+        return .warning
+    }
+    return .success
+}

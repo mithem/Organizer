@@ -31,6 +31,7 @@ struct MainScreen: View {
     @AppStorage(UserDefaultsKeys.eventAlarmOffset) var alarmRelativeOffsetString = EventAlarmOffset.none.rawValue
     
     let store = EKEventStore()
+    let feedbackGenerator = UINotificationFeedbackGenerator()
     
     init() {
         checkAuthStatus(with: store)
@@ -50,6 +51,7 @@ struct MainScreen: View {
                 VStack {
                     ProgressView(value: progressValue)
                         .animation(.easeInOut)
+                        .accessibility(identifier: "ProgressBar")
                     HStack {
                         Spacer()
                         Text(progressDescription)
@@ -77,9 +79,6 @@ struct MainScreen: View {
     }
     
     func parseFromPasteboardAndOrganize() {
-//        checkSiriKitAuthorization {
-//            print($0)
-//        }
         progressDescription = "Parsing tasks"
         progressValue = 0
         let beginComponents = Calendar.current.dateComponents([.hour, .minute], from: beginning)
@@ -129,6 +128,7 @@ extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
 extension MainScreen: ExportToCalendarDelegate {
     func beginExport() {
         progressDescription = "Exporting \(events.count) events"
+        feedbackGenerator.prepare()
     }
     
     func exportComplete(unexportedItems: [EKEvent], showActionSheet: Bool) {
@@ -143,6 +143,7 @@ extension MainScreen: ExportToCalendarDelegate {
         if unsuccessfulDataManager.hasItems {
             showingUnsuccessfulDataView = true
         }
+        feedbackGenerator.notificationOccurred(getTapticNotificationType(eventsCount: events.count, notScheduledEventsCount: unexportedItems.count, notOrganizedTasksCount: unsuccessfulDataManager.notOrganizedTasks.count, notParsableLinesCount: unsuccessfulDataManager.notParsableLines.count))
     }
 }
 
