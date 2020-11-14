@@ -33,7 +33,7 @@ struct SettingsView: View {
                     }
                 }
                 .accessibility(label: Text("Pause length"))
-                Toggle("Enable alarm", isOn: Binding(get: {eventAlarmOffset != EventAlarmOffset.none.rawValue}, set: {eventAlarmOffset = $0 ? EventAlarmOffset.min15.rawValue : EventAlarmOffset.none.rawValue}))
+                Toggle("Enable reminder", isOn: Binding(get: {eventAlarmOffset != EventAlarmOffset.none.rawValue}, set: {eventAlarmOffset = $0 ? EventAlarmOffset.min15.rawValue : EventAlarmOffset.none.rawValue}))
                 if eventAlarmOffset != EventAlarmOffset.none.rawValue {
                     Picker("Remind before", selection: $eventAlarmOffset) {
                         ForEach(EventAlarmOffset.allCases) { value in
