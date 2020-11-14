@@ -48,23 +48,6 @@ func checkForCalendar(with store: EKEventStore) -> EKCalendar {
     }
 }
 
-//func checkSiriKitAuthorization(callback: @escaping (Bool) -> Void) {
-//    INPreferences.requestSiriAuthorization { status in
-//        switch(status){
-//        case .notDetermined:
-//            callback(false)
-//        case .restricted:
-//            callback(false)
-//        case .denied:
-//            callback(false)
-//        case .authorized:
-//            callback(true)
-//        @unknown default:
-//            callback(false)
-//        }
-//    }
-//}
-
 func createCalendar(with store: EKEventStore) -> EKCalendar {
     let calendar = EKCalendar(for: .event, eventStore: store)
     calendar.title = "Organizer"
@@ -82,7 +65,7 @@ func createCalendar(with store: EKEventStore) -> EKCalendar {
     return calendar
 }
 
-func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents) {
+func parseAndOrganizeTasks(_ lines: [String], delegate: ParseAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents) {
     func organize(with calendar: EKCalendar) {
         let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)])
         let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * (Float(1) / Float(3))))})
@@ -94,18 +77,13 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
         }
         delegate.finishedOrganizing(events: events, notOrganizedTasks: notOrganizedTasks, notParsableLines: notParsable)
     }
+    let parser = MarkdownParser()
     var tasks = [Task]()
     var notParsable = [String]()
-    if UIPasteboard.general.hasStrings {
-        if let strings = UIPasteboard.general.strings {
-            let parser = MarkdownParser()
-            for string in strings {
-                let (t, notParsableLines) = parser.parseTasks(from: string, progressCallback: {delegate.updateProgress($0 * Float(1) / Float(3))})
-                tasks.append(contentsOf: t)
-                notParsable.append(contentsOf: notParsableLines)
-            }
-            
-        }
+    for line in lines {
+        let (t, notParsableLines) = parser.parseTasks(from: line, progressCallback: {delegate.updateProgress($0 * Float(1) / Float(3))})
+        tasks.append(contentsOf: t)
+        notParsable.append(contentsOf: notParsableLines)
     }
     if tasks.count == 0 {
         delegate.didNotFindValidMarkdown()
@@ -115,7 +93,17 @@ func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeT
     }
 }
 
-protocol CopyFromPasteboardAndOrganizeTasksDelegate {
+func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents) {
+    if UIPasteboard.general.hasStrings {
+        if let strings = UIPasteboard.general.strings {
+            parseAndOrganizeTasks(strings, delegate: delegate, beginComponents: beginComponents, endComponents: endComponents)
+        }
+    }
+}
+
+typealias CopyFromPasteboardAndOrganizeTasksDelegate = ParseAndOrganizeTasksDelegate
+
+protocol ParseAndOrganizeTasksDelegate {
     var store: EKEventStore { get }
     var alarmRelativeOffset: TimeInterval? { get }
     

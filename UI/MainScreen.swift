@@ -102,7 +102,7 @@ struct MainScreen: View {
     }
 }
 
-extension MainScreen: CopyFromPasteboardAndOrganizeTasksDelegate {
+extension MainScreen: ParseAndOrganizeTasksDelegate {
     var alarmRelativeOffset: TimeInterval? {
         (EventAlarmOffset(rawValue: alarmRelativeOffsetString) ?? .none).timeInterval
     }
