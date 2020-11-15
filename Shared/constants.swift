@@ -33,4 +33,10 @@ struct UserDefaultsKeys {
     static let pauseLengthTimeInterval = "pauseLengthTimeInterval"
     static let didShowOnboardingView = "didShowOnboardingView"
     static let eventAlarmOffset = "eventAlarmOffset"
+    static let considerCalendarEventsWhenOrganizing = "considerCalendarEventsWhenOrganizing"
+    static let calendarIdentifier = "calendarIdentifier"
+}
+
+struct DefaultSettings {
+    static let considerCalendarEventsWhenOrganizing = false
 }

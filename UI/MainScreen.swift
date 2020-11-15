@@ -9,11 +9,14 @@ import SwiftUI
 import EventKit
 
 struct MainScreen: View {
+    @ObservedObject var unsuccessfulDataManager = UnsuccessfulDataManager()
+    
     @State private var showingDidNotFindValidMarkdownActionSheet = false
     @State private var buttonsDisabled = false
     
     @State private var showingExportSuccessfulActionSheet = false
     @State private var showingInvalidBeginAndEndActionSheet = false
+    @State private var showingEventsFoundInCalendarActionSheet = false
     
     @State private var beginning = Date(timeIntervalSinceNow: 0)
     @State private var end = Date(timeIntervalSinceNow: 15 * 60)
@@ -23,12 +26,12 @@ struct MainScreen: View {
     @State private var progressValue: Float = 0
     @State private var progressDescription = "Parse first."
     
-    @ObservedObject var unsuccessfulDataManager = UnsuccessfulDataManager()
-    
     @State private var showingUnsuccessfulDataView = false
     @State private var showingOnboardingView = false
+    @State private var showingCalendarPreview = false
     
     @AppStorage(UserDefaultsKeys.eventAlarmOffset) var alarmRelativeOffsetString = EventAlarmOffset.none.rawValue
+    @AppStorage(UserDefaultsKeys.considerCalendarEventsWhenOrganizing) var considerCalendarEvents = DefaultSettings.considerCalendarEventsWhenOrganizing
     
     let store = EKEventStore()
     let feedbackGenerator = UINotificationFeedbackGenerator()
@@ -40,6 +43,7 @@ struct MainScreen: View {
     var body: some View {
         NavigationView {
             Form {
+                Toggle("Consider calendar events", isOn: $considerCalendarEvents)
                 DatePicker("Beginning", selection: $beginning, displayedComponents: [.hourAndMinute])
                     .actionSheet(isPresented: $showingDidNotFindValidMarkdownActionSheet) {
                         ActionSheet(title: Text("No data found"), message: Text("Unable to find valid markdown from Things."), buttons: [.default(Text("OK"))])
@@ -57,17 +61,32 @@ struct MainScreen: View {
                     ProgressView(value: progressValue)
                         .animation(.easeInOut)
                         .accessibility(identifier: "ProgressBar")
+                        .actionSheet(isPresented: $showingEventsFoundInCalendarActionSheet) {
+                            ActionSheet(title: Text("Events found in calendar."), message: Text("How do you want to proceed?"), buttons: [.default(Text("Consider it/them")) {
+                                considerCalendarEvents = true
+                                parseFromPasteboardAndOrganize()
+                            }, .cancel(Text("Ignore")) {
+                                considerCalendarEvents = false
+                                parseFromPasteboardAndOrganize()
+                            }])
+                        }
                     HStack {
                         Spacer()
+                            .sheet(isPresented: $showingCalendarPreview) {
+                                CalendarPreview(store: store)
+                            }
                         Text(progressDescription)
                             .foregroundColor(.secondary)
                             .accessibility(label: Text("Progress description"))
                             .accessibility(value: Text(progressDescription))
+                            .sheet(isPresented: $showingUnsuccessfulDataView) {
+                                UnsuccessfulDataView(manager: unsuccessfulDataManager)
+                            }
                         Spacer()
+                            .sheet(isPresented: $showingOnboardingView) {
+                                OnboardingView()
+                            }
                     }
-                }
-                .sheet(isPresented: $showingOnboardingView) {
-                    OnboardingView()
                 }
                 Button("Parse from clipboard/pasteboard") {
                     parseFromPasteboardAndOrganize()
@@ -75,9 +94,6 @@ struct MainScreen: View {
                 .accessibility(hint: Text("Parse tasks from clipboard, organize them, and export to your calendar"))
                 .onAppear {
                     showingOnboardingView = !UserDefaults().bool(forKey: UserDefaultsKeys.didShowOnboardingView)
-                }
-                .sheet(isPresented: $showingUnsuccessfulDataView) {
-                    UnsuccessfulDataView(manager: unsuccessfulDataManager)
                 }
             }
             .navigationBarItems(trailing: NavigationLink("Settings", destination: SettingsView()))
@@ -95,8 +111,8 @@ struct MainScreen: View {
         if beginning >= end {
             showingInvalidBeginAndEndActionSheet = true
         } else {
-            DispatchQueue.global().sync { // So progress bar can update on main thread
-                copyFromPasteboardAndOrganizeTasks(delegate: self, beginComponents: beginComponents, endComponents: endComponents)
+            DispatchQueue.global().async { // So progress bar can update on main thread
+                copyFromPasteboardAndOrganizeTasks(delegate: self, beginComponents: beginComponents, endComponents: endComponents, store: store)
             }
         }
     }
@@ -126,6 +142,10 @@ extension MainScreen: ParseAndOrganizeTasksDelegate {
         self.events = events
         
         exportToCalendar(events: self.events, delegate: self, showCalendar: (notOrganizedTasks.isEmpty && notParsableLines.isEmpty) ? nil : false)
+        
+        showingCalendarPreview = true
+        
+        feedbackGenerator.prepare()
     }
     
     func didNotFindValidMarkdown() {
@@ -137,21 +157,28 @@ extension MainScreen: ParseAndOrganizeTasksDelegate {
 extension MainScreen: ExportToCalendarDelegate {
     func beginExport() {
         progressDescription = "Exporting \(events.count) events"
-        feedbackGenerator.prepare()
+        if events.count > 10 { // approximately, of course..
+            feedbackGenerator.prepare()
+        }
     }
     
     func exportComplete(unexportedItems: [EKEvent], showActionSheet: Bool) {
         progressValue = 1
+        
         DispatchQueue.main.async {
             unsuccessfulDataManager.notScheduledEvents = unexportedItems
         }
+        
         if showActionSheet && unexportedItems.count < events.count {
             showingExportSuccessfulActionSheet = true
         }
+        
         progressDescription = "Exported \(events.count - unexportedItems.count) events."
+        
         if unsuccessfulDataManager.hasItems {
             showingUnsuccessfulDataView = true
         }
+        
         feedbackGenerator.notificationOccurred(getTapticNotificationType(eventsCount: events.count, notScheduledEventsCount: unexportedItems.count, notOrganizedTasksCount: unsuccessfulDataManager.notOrganizedTasks.count, notParsableLinesCount: unsuccessfulDataManager.notParsableLines.count))
     }
 }

@@ -13,18 +13,30 @@ struct EventOrganizer {
     let dateComponentsForLimits: [(DateComponents, DateComponents)]
     let pauseEvery: TimeInterval
     let pauseLength: TimeInterval
+    let considerEvents: Bool
+    let store: EKEventStore
     
-    init(dateComponentsForLimits: [(DateComponents, DateComponents)], pauseEvery: TimeInterval? = nil, pauseLength: TimeInterval? = nil) {
-        self.dateComponentsForLimits = dateComponentsForLimits
+    init(dateComponentsForLimits: [(DateComponents, DateComponents)], store: EKEventStore, pauseEvery: TimeInterval? = nil, pauseLength: TimeInterval? = nil) {
+        self.store = store
+        let ud = UserDefaults()
+        considerEvents = ud.bool(forKey: UserDefaultsKeys.considerCalendarEventsWhenOrganizing)
+        
         if let pauseEvery = pauseEvery {
             self.pauseEvery = pauseEvery
         } else {
-            self.pauseEvery = (PauseEveryTimeInterval(rawValue: UserDefaults().string(forKey: UserDefaultsKeys.pauseEveryTimeInterval) ?? "2h") ?? PauseEveryTimeInterval.h2).timeInterval
+            self.pauseEvery = (PauseEveryTimeInterval(rawValue: ud.string(forKey: UserDefaultsKeys.pauseEveryTimeInterval) ?? "2h") ?? PauseEveryTimeInterval.h2).timeInterval
         }
         if let pauseLength = pauseLength {
             self.pauseLength = pauseLength
         } else {
-            self.pauseLength = (PauseLengthTimeInterval(rawValue: UserDefaults().string(forKey: UserDefaultsKeys.pauseLengthTimeInterval) ?? "45 min") ?? PauseLengthTimeInterval.min45).timeInterval
+            self.pauseLength = (PauseLengthTimeInterval(rawValue: ud.string(forKey: UserDefaultsKeys.pauseLengthTimeInterval) ?? "45 min") ?? PauseLengthTimeInterval.min45).timeInterval
+        }
+        
+        if considerEvents {
+            let events = getEventsForToday(from: store)
+            self.dateComponentsForLimits = Self._getDateComponentsForLimits(fromEvents: events, originalComponents: dateComponentsForLimits)
+        } else {
+            self.dateComponentsForLimits = dateComponentsForLimits
         }
     }
     
@@ -73,6 +85,40 @@ struct EventOrganizer {
             result.append(contentsOf: taskDict[key]!.sorted())
         }
         return result
+    }
+    
+    static func _getDateComponentsForLimits(fromEvents events: [EKEvent], originalComponents: [(DateComponents, DateComponents)]) -> [(DateComponents, DateComponents)] {
+        func c(_ date: Date) -> DateComponents { Calendar.current.dateComponents([.hour, .minute], from: date) }
+        guard events.count > 0 else { return originalComponents }
+        
+        var theOriginalComponents = originalComponents
+        
+        if originalComponents.first?.0 == c(events.first!.startDate) {
+            theOriginalComponents[0].0 = c(events.first!.endDate)
+        }
+        
+        var allComponents: Set<DateComponents> = .init(originalComponents.flatMap {[$0.0, $0.1]})
+        
+        for event in events {
+            allComponents.insert(c(event.startDate))
+            allComponents.insert(c(event.endDate))
+        }
+        let sortedComponents = allComponents.sorted()
+        
+        var components = [(DateComponents, DateComponents)]()
+        for i in 1 ..< allComponents.count {
+            let first = sortedComponents[i - 1]
+            let second = sortedComponents[i]
+            components.append((first, second))
+        }
+        
+        for event in events {
+            if let idx = components.firstIndex(where: {$0.0 == c(event.startDate)}) {
+                components.remove(at: idx)
+            }
+        }
+        
+        return components
     }
     
     func organize(tasks: [Task], with store: EKEventStore, for calendar: EKCalendar, progressCallback: (Float) -> Void) -> (events: [EKEvent], notOrganizedTasks: [Task]) {

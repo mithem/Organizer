@@ -48,6 +48,7 @@ extension EKEvent {
     var timeInterval: String {
         let formatter = DateIntervalFormatter()
         formatter.timeStyle = .short
+        formatter.dateStyle = .none
         return formatter.string(from: startDate, to: endDate)
     }
 }
@@ -57,5 +58,17 @@ extension EKEvent: Identifiable {}
 extension EKEvent: Comparable {
     public static func < (lhs: EKEvent, rhs: EKEvent) -> Bool {
         return lhs.startDate < rhs.startDate
+    }
+}
+
+extension DateComponents: Comparable {
+    public static func < (lhs: DateComponents, rhs: DateComponents) -> Bool {
+        if lhs.year ?? 0 < rhs.year ?? 0 { return true } else if lhs.year ?? 0 > rhs.year ?? 0 { return false }
+        if lhs.month ?? 0 < rhs.month ?? 0 { return true } else if lhs.month ?? 0 > rhs.month ?? 0 { return false }
+        if lhs.day ?? 0 < rhs.day ?? 0 { return true } else if lhs.day ?? 0 > rhs.day ?? 0 { return false }
+        if lhs.hour ?? 0 < rhs.hour ?? 0 { return true } else if lhs.hour ?? 0 > rhs.hour ?? 0 { return false }
+        if lhs.minute ?? 0 < rhs.minute ?? 0 { return true } else if lhs.minute ?? 0 > rhs.minute ?? 0 { return false }
+        if lhs.second ?? 0 < rhs.second ?? 0 { return true } else if lhs.second ?? 0 > rhs.second ?? 0 { return false }
+        return false
     }
 }

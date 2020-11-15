@@ -31,14 +31,16 @@ func checkAuthStatus(with store: EKEventStore) {
         print("Denied")
     case .authorized:
         print("Authorized")
+        _ = checkForCalendar(with: store)
     @unknown default:
         print("Unkown")
     }
 }
 
 func checkForCalendar(with store: EKEventStore) -> EKCalendar {
-    if let identifier = UserDefaults().string(forKey: "calendarIdentifier") {
+    if let identifier = UserDefaults().string(forKey: UserDefaultsKeys.calendarIdentifier) {
         if let calendar = store.calendar(withIdentifier: identifier) {
+            print("Found calendar.")
             return calendar
         } else {
             return createCalendar(with: store)
@@ -65,10 +67,12 @@ func createCalendar(with store: EKEventStore) -> EKCalendar {
     return calendar
 }
 
-func parseAndOrganizeTasks(_ lines: [String], delegate: ParseAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents) {
+func parseAndOrganizeTasks(_ lines: [String], delegate: ParseAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents, store: EKEventStore) {
     func organize(with calendar: EKCalendar) {
-        let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)])
-        let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar, progressCallback: {delegate.updateProgress(0.33333 + ($0 * (Float(1) / Float(3))))})
+        let organizer = EventOrganizer(dateComponentsForLimits: [(beginComponents, endComponents)], store: store)
+        let (events, notOrganizedTasks) = organizer.organize(tasks: tasks, with: delegate.store, for: calendar) {
+            delegate.updateProgress(0.33333 + ($0 * (Float(1) / Float(3))))
+        }
         if let offset = delegate.alarmRelativeOffset {
             for i in 0..<events.count {
                 let alarm = EKAlarm(relativeOffset: offset)
@@ -93,10 +97,10 @@ func parseAndOrganizeTasks(_ lines: [String], delegate: ParseAndOrganizeTasksDel
     }
 }
 
-func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents) {
+func copyFromPasteboardAndOrganizeTasks(delegate: CopyFromPasteboardAndOrganizeTasksDelegate, beginComponents: DateComponents, endComponents: DateComponents, store: EKEventStore) {
     if UIPasteboard.general.hasStrings {
         if let strings = UIPasteboard.general.strings {
-            parseAndOrganizeTasks(strings, delegate: delegate, beginComponents: beginComponents, endComponents: endComponents)
+            parseAndOrganizeTasks(strings, delegate: delegate, beginComponents: beginComponents, endComponents: endComponents, store: store)
         }
     }
 }
@@ -131,7 +135,9 @@ func exportToCalendar(events: [EKEvent], delegate: ExportToCalendarDelegate, sho
         guard let first = events.first else { delegate.exportComplete(unexportedItems: events, showActionSheet: false); return }
         let timestamp = first.startDate.timeIntervalSinceReferenceDate
         delegate.exportComplete(unexportedItems: unexportedItems, showActionSheet: false)
-        UIApplication.shared.open(URL(string: "calshow:\(timestamp)")!)
+        DispatchQueue.main.async {
+            UIApplication.shared.open(URL(string: "calshow:\(timestamp)")!)
+        }
     } else {
         delegate.exportComplete(unexportedItems: unexportedItems, showActionSheet: unexportedItems.count == 0 ? true : false)
     }
@@ -185,4 +191,18 @@ func getTapticNotificationType(eventsCount: Int, notScheduledEventsCount: Int, n
         return .warning
     }
     return .success
+}
+
+func getEventsForToday(from store: EKEventStore) -> [EKEvent] {
+    var todayComponents = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+    let startDate = Calendar.current.date(from: todayComponents)!
+    todayComponents.hour = 23
+    todayComponents.minute = 59
+    let endDate = Calendar.current.date(from: todayComponents)!
+    let predicate = store.predicateForEvents(withStart: startDate, end: endDate, calendars: nil)
+    var events = [EKEvent]()
+    store.enumerateEvents(matching: predicate) { event, _ in
+        events.append(event)
+    }
+    return events
 }
