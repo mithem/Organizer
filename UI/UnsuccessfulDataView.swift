@@ -6,51 +6,53 @@
 //
 
 import SwiftUI
+import EventKit
 
 struct UnsuccessfulDataView: View {
-    @ObservedObject var manager: UnsuccessfulDataManager
-    @Environment(\.presentationMode) private var presentationMode
+    
+    @ObservedObject var manager: ExportReportDataManager
+    let store: EKEventStore
+    let delegate: ModalSheetDelegate
+    
     var body: some View {
-        NavigationView {
-            List {
-                if !manager.notScheduledEvents.isEmpty {
-                    Section(header: Text("Unscheduled events")) {
-                        ForEach(manager.notScheduledEvents) { event in
-                            EventView(event: event)
-                        }
+        List {
+            if !manager.notScheduledEvents.isEmpty {
+                Section(header: Text("Unscheduled events")) {
+                    ForEach(manager.notScheduledEvents) { event in
+                        EventView(event: event)
                     }
-                }
-                if !manager.notOrganizedTasks.isEmpty {
-                    Section(header: Text("Not organized tasks")) {
-                        ForEach(manager.notOrganizedTasks) { task in
-                            TaskView(task: task)
-                        }
-                    }
-                }
-                if !manager.notParsableLines.isEmpty {
-                    Section(header: Text("Not parsable lines")) {
-                        ForEach(manager.notParsableLines, id: \.self) { line in
-                            Text(line)
-                        }
-                    }
-                }
-                if !manager.hasItems {
-                    EmptyView()
-                        .onAppear {
-                            presentationMode.wrappedValue.dismiss()
-                        }
                 }
             }
-            .navigationTitle("Errors")
-            .navigationBarItems(trailing: Button("Done"){
-                presentationMode.wrappedValue.dismiss()
-            }.padding())
+            if !manager.notOrganizedTasks.isEmpty {
+                Section(header: Text("Not organized tasks")) {
+                    ForEach(manager.notOrganizedTasks) { task in
+                        TaskView(task: task)
+                    }
+                }
+            }
+            if !manager.notParsableLines.isEmpty {
+                Section(header: Text("Not parsable lines")) {
+                    ForEach(manager.notParsableLines, id: \.self) { line in
+                        Text(line)
+                    }
+                }
+            }
+            NavigationLink("Next", destination: CalendarPreview(manager: manager, delegate: self))
+                .buttonStyle(CustomButtonStyle())
         }
     }
 }
 
-struct UnsuccessfulDataView_Previews: PreviewProvider {
+extension UnsuccessfulDataView: ModalSheetDelegate {
+    func dismiss() {
+        delegate.dismiss()
+    }
+}
+
+struct UnsuccessfulDataView_Previews: PreviewProvider, ModalSheetDelegate {
+    func dismiss() {}
+    
     static var previews: some View {
-        UnsuccessfulDataView(manager: UnsuccessfulDataManager())
+        UnsuccessfulDataView(manager: ExportReportDataManager(), store: EKEventStore(), delegate: self as! ModalSheetDelegate)
     }
 }

@@ -9,12 +9,11 @@ import SwiftUI
 import EventKit
 
 struct MainScreen: View {
-    @ObservedObject var unsuccessfulDataManager = UnsuccessfulDataManager()
+    @ObservedObject var exportReportDataManager = ExportReportDataManager()
     
     @State private var showingDidNotFindValidMarkdownActionSheet = false
     @State private var buttonsDisabled = false
     
-    @State private var showingExportSuccessfulActionSheet = false
     @State private var showingInvalidBeginAndEndActionSheet = false
     @State private var showingEventsFoundInCalendarActionSheet = false
     
@@ -26,19 +25,14 @@ struct MainScreen: View {
     @State private var progressValue: Float = 0
     @State private var progressDescription = "Parse first."
     
-    @State private var showingUnsuccessfulDataView = false
+    @State private var showingExportReportView = false
     @State private var showingOnboardingView = false
-    @State private var showingCalendarPreview = false
     
     @AppStorage(UserDefaultsKeys.eventAlarmOffset) var alarmRelativeOffsetString = EventAlarmOffset.none.rawValue
     @AppStorage(UserDefaultsKeys.considerCalendarEventsWhenOrganizing) var considerCalendarEvents = DefaultSettings.considerCalendarEventsWhenOrganizing
     
     let store = EKEventStore()
     let feedbackGenerator = UINotificationFeedbackGenerator()
-    
-    init() {
-        checkAuthStatus(with: store)
-    }
     
     var body: some View {
         NavigationView {
@@ -70,22 +64,19 @@ struct MainScreen: View {
                                 parseFromPasteboardAndOrganize()
                             }])
                         }
+                        .sheet(isPresented: $showingExportReportView) {
+                            ExportReportView(manager: exportReportDataManager, store: store)
+                        }
                     HStack {
                         Spacer()
-                            .sheet(isPresented: $showingCalendarPreview) {
-                                CalendarPreview(store: store)
-                            }
                         Text(progressDescription)
                             .foregroundColor(.secondary)
                             .accessibility(label: Text("Progress description"))
                             .accessibility(value: Text(progressDescription))
-                            .sheet(isPresented: $showingUnsuccessfulDataView) {
-                                UnsuccessfulDataView(manager: unsuccessfulDataManager)
-                            }
                         Spacer()
-                            .sheet(isPresented: $showingOnboardingView) {
-                                OnboardingView()
-                            }
+                    }
+                    .sheet(isPresented: $showingOnboardingView) {
+                        OnboardingView()
                     }
                 }
                 Button("Parse from clipboard/pasteboard") {
@@ -93,6 +84,7 @@ struct MainScreen: View {
                 }
                 .accessibility(hint: Text("Parse tasks from clipboard, organize them, and export to your calendar"))
                 .onAppear {
+                    checkAuthStatus(with: store)
                     showingOnboardingView = !UserDefaults().bool(forKey: UserDefaultsKeys.didShowOnboardingView)
                 }
             }
@@ -112,6 +104,7 @@ struct MainScreen: View {
             showingInvalidBeginAndEndActionSheet = true
         } else {
             DispatchQueue.global().async { // So progress bar can update on main thread
+                exportReportDataManager.reset()
                 copyFromPasteboardAndOrganizeTasks(delegate: self, beginComponents: beginComponents, endComponents: endComponents, store: store)
             }
         }
@@ -136,14 +129,15 @@ extension MainScreen: ParseAndOrganizeTasksDelegate {
     func finishedOrganizing(events: [EKEvent], notOrganizedTasks: [Task], notParsableLines: [String]) {
         progressValue = 0.66666
         DispatchQueue.main.async {
-            unsuccessfulDataManager.notOrganizedTasks = notOrganizedTasks
-            unsuccessfulDataManager.notParsableLines = notParsableLines
+            exportReportDataManager.notOrganizedTasks = notOrganizedTasks
+            exportReportDataManager.notParsableLines = notParsableLines
+            exportReportDataManager.exportedEvents = events
         }
         self.events = events
         
         exportToCalendar(events: self.events, delegate: self, showCalendar: (notOrganizedTasks.isEmpty && notParsableLines.isEmpty) ? nil : false)
         
-        showingCalendarPreview = true
+        showingExportReportView = true
         
         feedbackGenerator.prepare()
     }
@@ -166,20 +160,12 @@ extension MainScreen: ExportToCalendarDelegate {
         progressValue = 1
         
         DispatchQueue.main.async {
-            unsuccessfulDataManager.notScheduledEvents = unexportedItems
-        }
-        
-        if showActionSheet && unexportedItems.count < events.count {
-            showingExportSuccessfulActionSheet = true
+            exportReportDataManager.notScheduledEvents = unexportedItems
         }
         
         progressDescription = "Exported \(events.count - unexportedItems.count) events."
         
-        if unsuccessfulDataManager.hasItems {
-            showingUnsuccessfulDataView = true
-        }
-        
-        feedbackGenerator.notificationOccurred(getTapticNotificationType(eventsCount: events.count, notScheduledEventsCount: unexportedItems.count, notOrganizedTasksCount: unsuccessfulDataManager.notOrganizedTasks.count, notParsableLinesCount: unsuccessfulDataManager.notParsableLines.count))
+        feedbackGenerator.notificationOccurred(getTapticNotificationType(eventsCount: events.count, notScheduledEventsCount: unexportedItems.count, notOrganizedTasksCount: exportReportDataManager.notOrganizedTasks.count, notParsableLinesCount: exportReportDataManager.notParsableLines.count))
     }
 }
 

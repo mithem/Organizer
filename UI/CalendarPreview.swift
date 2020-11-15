@@ -9,34 +9,31 @@ import SwiftUI
 import EventKitUI
 
 struct CalendarPreview: View {
-    let store: EKEventStore
-    @State private var events = [EKEvent]()
-    @State private var loading = true
+    @ObservedObject var manager: ExportReportDataManager
+    let delegate: ModalSheetDelegate
     var body: some View {
-        NavigationView {
-            Group {
-                if loading {
-                    List(events) { event in
-                        EventView(event: event)
-                    }
-                } else {
-                    LoadingIndicator()
-                        .onAppear(perform: loadEvents)
+        List {
+            if manager.exportedEvents.isEmpty {
+                Text("No events were exported.")
+            } else {
+                Text("The following events were exported.")
+                ForEach(manager.exportedEvents) { event in
+                    EventView(event: event)
                 }
             }
-            .navigationTitle("Overview")
+            Button("Finish") {
+                delegate.dismiss()
+            }
+            .buttonStyle(CustomButtonStyle())
         }
-    }
-    
-    func loadEvents() {
-        loading = true
-        events = getEventsForToday(from: store)
-        loading = false
+        .navigationTitle("Calendar preview")
     }
 }
 
-struct CalendarPreview_Previews: PreviewProvider {
+struct CalendarPreview_Previews: PreviewProvider, ModalSheetDelegate {
+    func dismiss() {}
+    
     static var previews: some View {
-        CalendarPreview(store: EKEventStore())
+        CalendarPreview(manager: ExportReportDataManager(), delegate: self as! ModalSheetDelegate)
     }
 }

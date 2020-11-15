@@ -40,3 +40,5 @@ struct UserDefaultsKeys {
 struct DefaultSettings {
     static let considerCalendarEventsWhenOrganizing = false
 }
+
+let notAvailableString = "N/A"

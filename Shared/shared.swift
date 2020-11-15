@@ -37,7 +37,7 @@ func checkAuthStatus(with store: EKEventStore) {
     }
 }
 
-func checkForCalendar(with store: EKEventStore) -> EKCalendar {
+func checkForCalendar(with store: EKEventStore) -> EKCalendar? {
     if let identifier = UserDefaults().string(forKey: UserDefaultsKeys.calendarIdentifier) {
         if let calendar = store.calendar(withIdentifier: identifier) {
             print("Found calendar.")
@@ -50,7 +50,7 @@ func checkForCalendar(with store: EKEventStore) -> EKCalendar {
     }
 }
 
-func createCalendar(with store: EKEventStore) -> EKCalendar {
+func createCalendar(with store: EKEventStore) -> EKCalendar? {
     let calendar = EKCalendar(for: .event, eventStore: store)
     calendar.title = "Organizer"
     calendar.source = store.sources.filter{
@@ -63,6 +63,7 @@ func createCalendar(with store: EKEventStore) -> EKCalendar {
         print("Created calendar!")
     } catch {
         print("Error saving calendar: \(error)")
+        return nil
     }
     return calendar
 }
@@ -92,8 +93,11 @@ func parseAndOrganizeTasks(_ lines: [String], delegate: ParseAndOrganizeTasksDel
     if tasks.count == 0 {
         delegate.didNotFindValidMarkdown()
     } else {
-        let calendar = checkForCalendar(with: delegate.store)
+        if let calendar = checkForCalendar(with: delegate.store) {
         organize(with: calendar)
+        } else {
+            // TODO: Error callback
+        }
     }
 }
 
@@ -118,7 +122,9 @@ protocol ParseAndOrganizeTasksDelegate {
 }
 
 func exportToCalendar(events: [EKEvent], delegate: ExportToCalendarDelegate, showCalendar: Bool? = nil) {
-    delegate.beginExport()
+    DispatchQueue.global().async {
+        delegate.beginExport()
+    }
     var unexportedItems = [EKEvent]()
     var idx = 0
     for event in events {

@@ -45,11 +45,21 @@ extension EKEvent {
         let isAllDay = self.isAllDay == (object as? EKEvent)?.isAllDay
         return title && location && calendar && alarms && url && startDate && endDate && isAllDay
     }
+    
     var timeInterval: String {
         let formatter = DateIntervalFormatter()
         formatter.timeStyle = .short
         formatter.dateStyle = .none
         return formatter.string(from: startDate, to: endDate)
+    }
+    
+    var duration: String {
+        guard let sD = startDate, let eD = endDate else { return notAvailableString }
+        let interval = eD - sD
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: interval) ?? notAvailableString
     }
 }
 
@@ -70,5 +80,11 @@ extension DateComponents: Comparable {
         if lhs.minute ?? 0 < rhs.minute ?? 0 { return true } else if lhs.minute ?? 0 > rhs.minute ?? 0 { return false }
         if lhs.second ?? 0 < rhs.second ?? 0 { return true } else if lhs.second ?? 0 > rhs.second ?? 0 { return false }
         return false
+    }
+}
+
+extension Date {
+    static func - (lhs: Date, rhs: Date) -> TimeInterval {
+        return lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
     }
 }

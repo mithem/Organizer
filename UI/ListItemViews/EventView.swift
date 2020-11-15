@@ -14,7 +14,7 @@ struct EventView: View {
         HStack {
             Text(event.title)
             Spacer()
-            Text(event.timeInterval)
+            Text("\(event.duration), \(event.timeInterval)")
         }
     }
 }
