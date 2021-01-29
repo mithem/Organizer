@@ -38,19 +38,27 @@ struct MainScreen: View {
         NavigationView {
             Form {
                 Toggle("Consider calendar events", isOn: $considerCalendarEvents)
-                DatePicker("Beginning", selection: $beginning, displayedComponents: [.hourAndMinute])
-                    .actionSheet(isPresented: $showingDidNotFindValidMarkdownActionSheet) {
-                        ActionSheet(title: Text("No data found"), message: Text("Unable to find valid markdown from Things."), buttons: [.default(Text("OK"))])
-                    }
-                    .accessibility(label: Text("Start time"))
-                    .accessibilityAction(named: Text("Set start time to now"), {beginning = Date(timeIntervalSinceNow: 0)})
-                DatePicker("End", selection: $end, displayedComponents: [.hourAndMinute])
-                    .actionSheet(isPresented: $showingInvalidBeginAndEndActionSheet) {
-                        ActionSheet(title: Text("Invalid beginning & end"), message: Text("Please make sure that the end date is later than beginning."), buttons: [.default(Text("OK"))])
-                    }
-                    .accessibility(label: Text("End time"))
-                    .accessibilityAction(named: Text("Set end time to in 15 minutes"), {end = Date(timeIntervalSinceNow: 15 * 60)})
-                    .accessibilityAction(named: Text("Set end time to in 1 hour"), {end = Date(timeIntervalSinceNow: 3600)})
+                HStack {
+                    Text("Beginning")
+                    DatePicker("Beginning", selection: $beginning, displayedComponents: [.hourAndMinute])
+                        .datePickerStyle(GraphicalDatePickerStyle())
+                        .actionSheet(isPresented: $showingDidNotFindValidMarkdownActionSheet) {
+                            ActionSheet(title: Text("No data found"), message: Text("Unable to find valid markdown from Things."), buttons: [.default(Text("OK"))])
+                        }
+                        .accessibility(label: Text("Start time"))
+                        .accessibilityAction(named: Text("Set start time to now"), {beginning = Date(timeIntervalSinceNow: 0)})
+                }
+                HStack {
+                    Text("End")
+                    DatePicker("End", selection: $end, displayedComponents: [.hourAndMinute])
+                        .datePickerStyle(GraphicalDatePickerStyle())
+                        .actionSheet(isPresented: $showingInvalidBeginAndEndActionSheet) {
+                            ActionSheet(title: Text("Invalid beginning & end"), message: Text("Please make sure that the end date is later than beginning."), buttons: [.default(Text("OK"))])
+                        }
+                        .accessibility(label: Text("End time"))
+                        .accessibilityAction(named: Text("Set end time to in 15 minutes"), {end = Date(timeIntervalSinceNow: 15 * 60)})
+                        .accessibilityAction(named: Text("Set end time to in 1 hour"), {end = Date(timeIntervalSinceNow: 3600)})
+                }
                 VStack {
                     ProgressView(value: progressValue)
                         .animation(.easeInOut)
