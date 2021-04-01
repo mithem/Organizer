@@ -23,28 +23,28 @@ class MarkdownParserTests: XCTestCase {
         result = MarkdownParser.taskRegex.firstMatch(in: string, range: range)
         XCTAssertNotNil(result, "No match found.")
         if let result = result {
-            XCTAssertEqual(string[Range(result.range(at: 2))!], "Example !task 1")
+            XCTAssertEqual(string[Range(result.range(withName: "title"))!], "Example !task 1")
         }
         
         string = "- [] Another task&%"
         result = MarkdownParser.taskRegex.firstMatch(in: string, range: range)
         XCTAssertNotNil(result, "No match found.")
         if let result = result {
-            XCTAssertEqual(string[Range(result.range(at: 2))!], "Another task&%")
+            XCTAssertEqual(string[Range(result.range(withName: "title"))!], "Another task&%")
         }
         
-        string = "- 23.08.2020 [] Another§$ task?"
+        string = "- [] 23.08.2020 Another§$ task?"
         result = MarkdownParser.taskRegex.firstMatch(in: string, range: range)
         XCTAssertNotNil(result, "No match found.")
         if let result = result {
-            XCTAssertEqual(string[Range(result.range(at: 2))!], "Another§$ task?")
+            XCTAssertEqual(string[Range(result.range(at: 3))!], "Another§$ task?")
         }
         
-        string = "- (23.08.2020) [] Completed task"
+        string = "- [x] 22.08.2020 Completed task"
         result = MarkdownParser.taskRegex.firstMatch(in: string, range: range)
         XCTAssertNotNil(result, "No match found.")
         if let result = result {
-            XCTAssertEqual(string[Range(result.range(at: 2))!], "Completed task")
+            XCTAssertEqual(string[Range(result.range(at: 3))!], "Completed task")
         }
     }
     
@@ -149,10 +149,10 @@ class MarkdownParserTests: XCTestCase {
     func testParseTasksUpcoming() {
         let input = """
 - [ ] hello
-- 22.08.2020 [+] 1h clean the room (22.08.2020)
-- 22.08.2020 [x] 0h30min another test!
-- 22.08.2020 [] 5m Yet& another🚀 .task%
-- (22.08.2020) [ ] 1h 15m logged but maybe still useful
+- [+] 22.08.2020 1h clean the room (22.08.2020)
+- [x] 22.08.2020 0h30min another test!
+- [] 22.08.2020 5m Yet& another🚀 .task%
+- [ ] 22.08.2020 1h 15m logged but maybe still useful
 - [] 1h hello
 - [ ] 2h And another! (25.08.2020)
 """
@@ -172,12 +172,12 @@ class MarkdownParserTests: XCTestCase {
     func testParseTasksSorting() {
         func task(_ title: String) -> Task { Task(title: title, date: day, time: 30 * 60) }
         let input = """
-- 23.08.2020 [] 30m AB
-- 23.08.2020 [] 30m AA
-- 23.08.2020 [] 30m AC
-- 23.08.2020 [] 30m BC
-- 23.08.2020 [] 30m BA
-- 23.08.2020 [] 30m BB
+- [] 23.08.2020 30m AA
+- [] 23.08.2020 30m AB
+- [] 23.08.2020 30m AC
+- [] 23.08.2020 30m BA
+- [] 23.08.2020 30m BB
+- [] 23.08.2020 30m BC
 """
         
         let day = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 23, hour: 12))!

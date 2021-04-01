@@ -90,16 +90,18 @@ struct EventOrganizer {
     static func _getDateComponentsForLimits(fromEvents events: [EKEvent], originalComponents: [(DateComponents, DateComponents)]) -> [(DateComponents, DateComponents)] {
         func c(_ date: Date) -> DateComponents { Calendar.current.dateComponents([.hour, .minute], from: date) }
         guard events.count > 0 else { return originalComponents }
+        guard originalComponents.count > 0 else { return originalComponents }
         
         var theOriginalComponents = originalComponents
         
-        if originalComponents.first?.0 == c(events.first!.startDate) {
+        if !events.first!.isAllDay && originalComponents.first?.0 == c(events.first!.startDate) {
             theOriginalComponents[0].0 = c(events.first!.endDate)
         }
         
         var allComponents: Set<DateComponents> = .init(originalComponents.flatMap {[$0.0, $0.1]})
         
         for event in events {
+            if event.isAllDay { continue }
             allComponents.insert(c(event.startDate))
             allComponents.insert(c(event.endDate))
         }
@@ -113,6 +115,7 @@ struct EventOrganizer {
         }
         
         for event in events {
+            if event.isAllDay { continue }
             if let idx = components.firstIndex(where: {$0.0 == c(event.startDate)}) {
                 components.remove(at: idx)
             }

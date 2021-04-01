@@ -35,6 +35,27 @@ class EventOrganizerTests: XCTestCase {
         }
     }
     
+    func testGetLimits2() {
+        let organizer = EventOrganizer(dateComponentsForLimits: [(DateComponents(hour: 0, minute: 0), .init(hour: 23, minute: 59))], store: store)
+        
+        let task = Task(title: "Some task", date: Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 23))!, time: 600)
+        
+        let results = organizer._getLimits(for: task)
+        
+        let e1 = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 23))!
+        let e2 = Calendar.current.date(from: DateComponents(year: 2020, month: 8, day: 23, hour: 23, minute: 59))!
+        let e = [(e1, e2)]
+        
+        XCTAssertEqual(results.count, e.count)
+        
+        if results.count == e.count {
+            for i in 0..<results.count {
+                XCTAssertEqual(results[i].0, e[i].0)
+                XCTAssertEqual(results[i].1, e[i].1)
+            }
+        }
+    }
+    
     // MARK: Sort tasks
     func testSortTasks() {
         let organizer = EventOrganizer(dateComponentsForLimits: [], store: store) // irrelevant
@@ -76,14 +97,14 @@ class EventOrganizerTests: XCTestCase {
         
         let date = Calendar.current.date(from: dateComponents)!
         
-        let tasks = [Task(title: "My task", date: date, time: 10 * 60)]
+        let tasks = [Task(title: "My task", date: date, time: 600)]
         
         let results = organizer.organize(tasks: tasks, with: store, for: calendar, progressCallback: {_ in})
         
         let e = EKEvent(eventStore: store)
         e.title = "My task"
         e.startDate = Calendar.current.date(from: dateComponents)!
-        e.endDate = e.startDate + 10 * 60
+        e.endDate = e.startDate + 600
         e.calendar = calendar
         
         let expected = [e]
@@ -575,6 +596,32 @@ class EventOrganizerTests: XCTestCase {
         
         if result.count == expected.count {
             for i in 0 ..< result.count {
+                XCTAssertEqual(result[i].0, expected[i].0)
+                XCTAssertEqual(result[i].1, expected[i].1)
+            }
+        }
+    }
+    
+    func testGetDateComponentsForLimits4() {
+        func dc(h: Int, m: Int = 0) -> DateComponents { DateComponents(hour: h, minute: m) }
+        
+        let originalComponents = [(dc(h: 0), dc(h:23, m:59))]
+        
+        let d1 = Calendar.current.date(from: originalComponents[0].0)!
+        
+        let e = EKEvent(eventStore: store)
+        e.title = "Event"
+        e.startDate = d1
+        e.endDate = e.startDate + 600
+        
+        let result = EventOrganizer._getDateComponentsForLimits(fromEvents: [e], originalComponents: originalComponents)
+        
+        let expected = [(dc(h: 0, m: 10), dc(h: 23, m: 59))]
+        
+        XCTAssertEqual(result.count, expected.count)
+        
+        if result.count == expected.count {
+            for i in 0..<result.count {
                 XCTAssertEqual(result[i].0, expected[i].0)
                 XCTAssertEqual(result[i].1, expected[i].1)
             }

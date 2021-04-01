@@ -13,7 +13,7 @@ struct MarkdownParser {
     
     static let _emojiRegex = NSRegularExpression("[\\U00010000-\\U0010FFFF]")
     static let _singleWordChar = #"[\w\s\d@ß?=!\^°\"\'§\$,&\.%\/\(\)]"#
-    static let taskRegex = NSRegularExpression(#"^- \(?(?<date>\d\d\.\d\d\.\d\d\d\d)?\)? ?\[[+ x]?\] (?<title>.+?)( \(\d\d\.\d\d\.\d\d\d\d\))?$"#)
+    static let taskRegex = NSRegularExpression(#"^- ?\[[+ x]?\] ((?<date>\d\d\.\d\d\.\d\d\d\d) )?(?<title>.+?)( \(\d\d\.\d\d\.\d\d\d\d\))?$"#)
     static let taskNameRegex = NSRegularExpression(#"^ ?((?<n1>\d\d?)(?<u>h|(min|m))(( )?(?<n2>\d\d?)(min|m))?)? ?(?<title>.*)$"#)
     
     func parseTasks(from input: String, progressCallback: (Float) -> Void) -> (tasks: [Task], notParsableLines: [String]) {

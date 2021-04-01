@@ -71,16 +71,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C23B5675-EA28-4144-91AE-CDC84A943F0E"
+            uuid = "B5291957-904D-4095-9560-5C3128B26633"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "OrganizerTests/EventOrganizerTests.swift"
+            filePath = "UI/MainScreen.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "19"
-            endingLineNumber = "19"
-            landmarkName = "testGetLimits()"
+            startingLineNumber = "116"
+            endingLineNumber = "116"
+            landmarkName = "parseFromPasteboardAndOrganize()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
