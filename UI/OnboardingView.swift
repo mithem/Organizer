@@ -34,17 +34,11 @@ struct OnboardingView: View {
                 .padding(.horizontal, 60)
             }
             Spacer()
-            Button(action: {
+            Button("Finish") {
                 save()
                 presentationMode.wrappedValue.dismiss()
-            }) {
-                Text("Finish")
-                    .padding(.vertical)
-                    .padding(.horizontal, 100)
-                    .foregroundColor(.white)
-                    .background(Color.red)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
             }
+            .buttonStyle(CustomButtonStyle())
             .padding(.bottom, 100)
             .accessibility(hint: Text("Close this screen"))
         }

@@ -21,12 +21,15 @@ struct CalendarPreview: View {
                     EventView(event: event)
                 }
             }
-            Button("Finish") {
-                delegate.dismiss()
-            }
-            .buttonStyle(CustomButtonStyle())
+            FinishButton
         }
         .navigationTitle("Calendar preview")
+    }
+    var FinishButton: some View {
+        let content = Button("Finish") {
+            delegate.dismiss()
+        }
+        return content.buttonStyle(CustomButtonStyle())
     }
 }
 

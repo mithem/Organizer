@@ -19,7 +19,6 @@ struct CustomButtonStyle: ButtonStyle {
                     .foregroundColor(.accentColor)
                     .opacity(colorScheme == .dark ? 0.7 : 1)
             )
-            .hoverEffect(.highlight)
     }
 }
 
