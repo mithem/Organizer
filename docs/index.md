@@ -1,8 +1,9 @@
 # Organizer
 
+An app to organize tasks from Things and export them to your calendar.
+
 ## Usage
 
-An app to organize tasks from Things and export them to your calendar.
 To export todos from Things, do the following:
 - select multiple tasks that are similarily named to "15m walk the dog"
 - on iOS/iPadOS, click the three dots, then share, then copy
