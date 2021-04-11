@@ -16,4 +16,4 @@ We do not collect information besides the one Apple provides.
 
 ## Support/Contact
 
-If you have any questions, feedback or want to reach out otherwisem feel free to mail things.to.calendar@gmail.com.
+If you have any questions, feedback or want to reach out otherwise feel free to mail things.to.calendar@gmail.com.
