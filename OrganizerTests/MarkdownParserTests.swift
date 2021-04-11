@@ -11,6 +11,8 @@ import EventKit
 
 class MarkdownParserTests: XCTestCase {
     let parser = MarkdownParser()
+    /// the current date, but just with year, month & day of month information
+    let today = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Date()))!
     
     func testTaskRegex() {
         var string: String
@@ -37,14 +39,14 @@ class MarkdownParserTests: XCTestCase {
         result = MarkdownParser.taskRegex.firstMatch(in: string, range: range)
         XCTAssertNotNil(result, "No match found.")
         if let result = result {
-            XCTAssertEqual(string[Range(result.range(at: 3))!], "Another§$ task?")
+            XCTAssertEqual(string[Range(result.range(withName: "title"))!], "Another§$ task?")
         }
         
         string = "- [x] 22.08.2020 Completed task"
         result = MarkdownParser.taskRegex.firstMatch(in: string, range: range)
         XCTAssertNotNil(result, "No match found.")
         if let result = result {
-            XCTAssertEqual(string[Range(result.range(at: 3))!], "Completed task")
+            XCTAssertEqual(string[Range(result.range(withName: "title"))!], "Completed task")
         }
     }
     
@@ -188,5 +190,38 @@ class MarkdownParserTests: XCTestCase {
         
         XCTAssertEqual(results.tasks, expected)
         
+    }
+    
+    func testParseSingleTask() {
+        let input = """
+1h test todo
+
+These are notes
+
+- checklist item 1
+- checklist item 2
+
+Tags: mytag
+When: Today
+Deadline: 20.08.2020
+"""
+        
+        let results = parser.parseTasks(from: input, progressCallback: { _ in })
+        
+        let expected = [Task(title: "test todo", date: today, time: 3600)]
+        
+        XCTAssertEqual(results.tasks, expected)
+        XCTAssertEqual(results.notParsableLines, [])
+    }
+    
+    func testParseSingleTask2() {
+        let input = "30m test task"
+        
+        let results = parser.parseTasks(from: input, progressCallback: { _ in })
+        
+        let expected = [Task(title: "test task", date: today, time: 1800)]
+        
+        XCTAssertEqual(results.tasks, expected)
+        XCTAssertEqual(results.notParsableLines, [])
     }
 }
