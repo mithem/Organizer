@@ -51,12 +51,17 @@ func checkForCalendar(with store: EKEventStore) -> EKCalendar? {
 }
 
 func createCalendar(with store: EKEventStore) -> EKCalendar? {
+    /// https://nemecek.be/blog/45/how-to-create-new-calendar-using-eventkit-in-swift
+    func bestPossibleEKSource() -> EKSource? {
+        let `default` = store.defaultCalendarForNewEvents?.source
+        let iCloud = store.sources.first(where: { $0.sourceType == .calDAV })
+        let local = store.sources.first(where: { $0.sourceType == .local })
+        return `default` ?? iCloud ?? local
+    }
+    
     let calendar = EKCalendar(for: .event, eventStore: store)
     calendar.title = "Organizer"
-    calendar.source = store.sources.filter{
-        (source: EKSource) -> Bool in
-        source.sourceType.rawValue == EKSourceType.local.rawValue
-    }.first ?? store.sources.first
+    calendar.source = bestPossibleEKSource()
     do {
         try store.saveCalendar(calendar, commit: true)
         UserDefaults().set(calendar.calendarIdentifier, forKey: "calendarIdentifier")
